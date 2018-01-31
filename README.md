@@ -19,6 +19,20 @@ if (!requireNamespace("rtweet", quietly = TRUE)) {
 library(rtweet)
 ```
 
+Data
+----
+
+Two data collection methods are described in detail below. Hoewver, if you want to skip straight to the data, run the following code:
+
+``` r
+## read status IDs from raw github rds file
+ids <- readRDS(
+  "https://github.com/mkearney/rstudioconf_tweets/raw/master/data/search-ids.rds")
+
+## lookup data associated with status ids
+rt <- rtweet::lookup_tweets(ids)
+```
+
 Stream
 ------
 
@@ -96,6 +110,9 @@ if (file.exists(file.path("data", "search.rds"))) {
 
 ## save the data
 saveRDS(rt, file.path("data", "search.rds"))
+
+## save shareable data (only status_ids)
+saveRDS(rt[, "status_id"], file.path("data", "search-ids.rds"))
 ```
 
 Explore
@@ -130,18 +147,15 @@ rt %>%
 ```
 
 <p align="center">
-<img width="100%" src="README_files/figure-markdown_github/unnamed-chunk-5-1.png" < />
+<img width="100%" src="README_files/figure-markdown_github/unnamed-chunk-6-1.png" />
 </p>
 ### Positive/negative sentiment
 
 Next, some sentiment analysis of the tweets so far.
 
 ``` r
-## create new data frame
-d <- rt
-
 ## estimate pos/neg sentiment for each tweet
-d$sentiment <- syuzhet::get_sentiment(d$text, "syuzhet")
+rt$sentiment <- syuzhet::get_sentiment(rt$text, "syuzhet")
 
 ## write function to round time into rounded var
 round_time <- function(x, sec) {
@@ -149,10 +163,10 @@ round_time <- function(x, sec) {
 }
 
 ## plot by specified time interval (2-hours)
-d %>%
+rt %>%
   mutate(time = round_time(created_at, 60 * 60 * 2)) %>%
   group_by(time) %>%
-  summarise(sentiment = mean(sentiment, na.rmm = TRUE)) %>%
+  summarise(sentiment = mean(sentiment, na.rm = TRUE)) %>%
   mutate(valence = ifelse(sentiment > 0L, "Positive", "Negative")) %>%
   ggplot(aes(x = time, y = sentiment)) +
   geom_smooth(method = "loess", span = .25,
@@ -168,13 +182,13 @@ d %>%
   scale_fill_manual(values = c(Positive = "#2244ee", Negative = "#dd2222")) +
   scale_colour_manual(values = c(Positive = "#0022cc", Negative = "#bb0000")) +
   labs(x = NULL, y = NULL,
-       title = "Sentiment of rstudio::conf tweets over time",
-       subtitle = "Mean pos/neg sentiment of tweets aggregated in two-hour intervals",
+       title = "Sentiment (valence) of rstudio::conf tweets over time",
+       subtitle = "Mean sentiment of tweets aggregated in two-hour intervals",
     caption = "\n\nSource: Data gathered using rtweet. Sentiment analysis done using syuzhet")
 ```
 
 <p align="center">
-<img width="100%" src="README_files/figure-markdown_github/unnamed-chunk-6-1.png" < />
+<img width="100%" src="README_files/figure-markdown_github/unnamed-chunk-7-1.png" />
 </p>
 ### Semantic networks
 
@@ -221,7 +235,7 @@ size <- table(c(mat[, 1], mat[, 2]))
 size <- size[match(names(size), names(igraph::V(g)))]
 
 ## plot network
-par(mar = c(2, 0, 3, 0))
+par(mar = c(4, 2, 5, 2))
 plot(g, 
   layout = igraph::layout.auto(g),
   edge.size = .4,
@@ -230,24 +244,26 @@ plot(g,
   edge.arrow.size = 0,
   edge.arrow.width = 0,
   vertex.color = "#ADFF2F99",
-  vertex.size = sqrt(size) * 1.5,
+  vertex.size = sqrt(size) * 1.75,
   vertex.frame.color = "#003366",
   vertex.label.color = "#003366",
-  vertex.label.cex = .6,
+  vertex.label.cex = .75,
   vertex.label.family = "Roboto Condensed",
   edge.color = "#0066aa",
   edge.width = .2,
   main = "")
-par(mar = c(1, 0, 1, 0))
-title("Semantic network of users tweeting about rstudio::conf", adj = 0,
-  family = "Roboto Condensed", cex.main = 1.7)
+par(mar = c(3, 2, 3, 2))
+title("Semantic network of users tweeting about rstudio::conf", 
+  adj = 0, family = "Roboto Condensed", cex.main = 2.75)
 mtext("Source: Data gathered using rtweet. Network analysis done using igraph",
-  side = 1, line = 0, adj = 1.0, family = "Roboto Condensed", 
-  col = "#222222", cex = 1)
+  side = 1, line = 0, adj = 1.0, 
+  family = "Roboto Condensed", 
+  col = "#222222", cex = 1.6)
 mtext("User connections by mentions, replies, retweets, and quotes", 
-  side = 3, line = -1.75, adj = 0, family = "Roboto Condensed", cex = 1.3)
+  side = 3, line = -1.75, adj = 0, 
+  family = "Roboto Condensed", cex = 2.1)
 ```
 
 <p align="center">
-<img width="100%" src="README_files/figure-markdown_github/unnamed-chunk-7-1.png" < />
+<img width="100%" src="README_files/figure-markdown_github/unnamed-chunk-8-1.png" />
 </p>
