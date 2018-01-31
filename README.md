@@ -129,8 +129,8 @@ rt %>%
     x = NULL, y = NULL)
 ```
 
-<p style="text-align:center;">
-<img src="README_files/figure-markdown_github/unnamed-chunk-5-1.png" < />
+<p align="center">
+<img width="100%" src="README_files/figure-markdown_github/unnamed-chunk-5-1.png" < />
 </p>
 ### Positive/negative sentiment
 
@@ -173,8 +173,8 @@ d %>%
     caption = "\n\nSource: Data gathered using rtweet. Sentiment analysis done using syuzhet")
 ```
 
-<p style="text-align:center;">
-<img src="README_files/figure-markdown_github/unnamed-chunk-6-1.png" < />
+<p align="center">
+<img width="100%" src="README_files/figure-markdown_github/unnamed-chunk-6-1.png" < />
 </p>
 ### Semantic networks
 
@@ -183,8 +183,7 @@ Finally, the code below provides a quick and dirty visualization of the semantic
 ``` r
 ## unlist observations into long-form data frame
 unlist_df <- function(...) {
-  dots <- list(...)
-  dots <- lapply(dots, unlist)
+  dots <- lapply(list(...), unlist)
   tibble::as_tibble(dots)
 }
 
@@ -200,7 +199,7 @@ row_dfs <- lapply(
 
 ## bind rows, gather (to long), convert to matrix, and filter out NAs
 rdf <- dplyr::bind_rows(row_dfs)
-rdf <- gather(rdf, interaction_type, to_screen_name, -from_screen_name)
+rdf <- tidyr::gather(rdf, interaction_type, to_screen_name, -from_screen_name)
 mat <- as.matrix(rdf[, -2])
 mat <- mat[apply(mat, 1, function(i) !any(is.na(i))), ]
 
@@ -209,26 +208,46 @@ apps1 <- table(mat[, 1])
 apps2 <- table(mat[, 2])
 apps <- names(apps1)[names(apps1) %in% names(apps2)]
 
+## filter and convert to matrix
+mat <- mat[mat[, 1] %in% apps & mat[, 1] != mat[, 2], ]
+
 ## create graph object
-g <- igraph::graph_from_edgelist(mat[mat[, 1] %in% apps, ])
+g <- igraph::graph_from_edgelist(mat)
+
+## calculate size attriute
+size <- table(c(mat[, 1], mat[, 2]))
+
+## reorder freq table
+size <- size[match(names(size), names(igraph::V(g)))]
 
 ## plot network
-par(mar = c(0, 0, 0, 0))
+par(mar = c(2, 0, 3, 0))
 plot(g, 
-  edge.size = .5,
-  margin = c(-.05, -.05, -.05, -.05),
+  layout = igraph::layout.auto(g),
+  edge.size = .4,
+  curved = FALSE,
+  margin = -.05,
   edge.arrow.size = 0,
   edge.arrow.width = 0,
   vertex.color = "#ADFF2F99",
-  vertex.size = 14,
+  vertex.size = sqrt(size) * 1.5,
   vertex.frame.color = "#003366",
   vertex.label.color = "#003366",
   vertex.label.cex = .6,
-  vertex.label.family = "sans",
+  vertex.label.family = "Roboto Condensed",
   edge.color = "#0066aa",
-  edge.width = .4)
+  edge.width = .2,
+  main = "")
+par(mar = c(1, 0, 1, 0))
+title("Semantic network of users tweeting about rstudio::conf", adj = 0,
+  family = "Roboto Condensed", cex.main = 1.7)
+mtext("Source: Data gathered using rtweet. Network analysis done using igraph",
+  side = 1, line = 0, adj = 1.0, family = "Roboto Condensed", 
+  col = "#222222", cex = 1)
+mtext("User connections by mentions, replies, retweets, and quotes", 
+  side = 3, line = -1.75, adj = 0, family = "Roboto Condensed", cex = 1.3)
 ```
 
-<p style="text-align:center;">
-<img src="README_files/figure-markdown_github/unnamed-chunk-7-1.png" < />
+<p align="center">
+<img width="100%" src="README_files/figure-markdown_github/unnamed-chunk-7-1.png" < />
 </p>
