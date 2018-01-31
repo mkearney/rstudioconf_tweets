@@ -130,7 +130,7 @@ rt %>%
 ```
 
 <p style="text-align:center;">
-<img src="README_files/figure-markdown_github/unnamed-chunk-5-1.png" < /img>
+<img src="README_files/figure-markdown_github/unnamed-chunk-5-1.png" < />
 </p>
 ### Positive/negative sentiment
 
@@ -174,7 +174,7 @@ d %>%
 ```
 
 <p style="text-align:center;">
-<img src="README_files/figure-markdown_github/unnamed-chunk-6-1.png" < /img>
+<img src="README_files/figure-markdown_github/unnamed-chunk-6-1.png" < />
 </p>
 ### Semantic networks
 
@@ -230,5 +230,5 @@ plot(g,
 ```
 
 <p style="text-align:center;">
-<img src="README_files/figure-markdown_github/unnamed-chunk-7-1.png" < /img>
+<img src="README_files/figure-markdown_github/unnamed-chunk-7-1.png" < />
 </p>

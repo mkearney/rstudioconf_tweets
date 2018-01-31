@@ -131,7 +131,9 @@ rt %>%
     x = NULL, y = NULL)
 ```
 
-<p style="text-align:center;"><img src="README_files/figure-markdown_github/unnamed-chunk-5-1.png" < /img> </p>
+<p style="text-align:center;">
+<img src="README_files/figure-markdown_github/unnamed-chunk-5-1.png" < /> 
+</p>
 
 ### Positive/negative sentiment
 
@@ -174,7 +176,9 @@ d %>%
     caption = "\n\nSource: Data gathered using rtweet. Sentiment analysis done using syuzhet")
 ```
 
-<p style="text-align:center;"><img src="README_files/figure-markdown_github/unnamed-chunk-6-1.png" < /img> </p>
+<p style="text-align:center;">
+<img src="README_files/figure-markdown_github/unnamed-chunk-6-1.png" < /> 
+</p>
 
 ### Semantic networks
 
@@ -229,4 +233,6 @@ plot(g,
   edge.width = .4)
 ```
 
-<p style="text-align:center;"><img src="README_files/figure-markdown_github/unnamed-chunk-7-1.png" < /img> </p>
+<p style="text-align:center;">
+<img src="README_files/figure-markdown_github/unnamed-chunk-7-1.png" < /> 
+</p>
