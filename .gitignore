@@ -1,2 +1,4 @@
-data/**
+data/search.rds
 .Rproj.user
+data/stream.rds
+data/stream.json
