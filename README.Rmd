@@ -66,7 +66,7 @@ rt <- parse_stream(json_file)
 
 The second easy way to gather Twitter data using one or more keywords is to search for the data (using Twitter's REST API). Unlike streaming, searching makes it possible to go back in time. Unfortunately, Twitter sets a rather restrictive cap–roughly nine days–on how far back you can go. Regardless, searching for tweets is often the preferred method. For example, the code below is setup in such a way that it can be executed once [or even several times] a day throughout the conference.
 
-```{r, cahce=TRUE}
+```{r}
 ## search for up to 100,000 tweets mentionging rstudio::conf
 rt <- search_tweets(
   paste(rstudioconf, collapse = " OR "), 
@@ -111,7 +111,7 @@ suppressPackageStartupMessages(library(tidyverse))
 
 In the code below, the data is summarized into a time series-like data frame and then plotted in order depict the frequency of tweets–aggregated in two-hour intevals–about rstudio::conf over time.
 
-```{r fig.height=6, fig.width=9}
+```{r}
 rt %>%
   ts_plot("2 hours", color = "transparent") +
   geom_smooth(method = "loess", se = FALSE, span = .25, 
@@ -133,7 +133,7 @@ rt %>%
 
 Next, some sentiment analysis of the tweets so far.
 
-```{r fig.height=6, fig.width=9}
+```{r}
 ## create new data frame
 d <- rt
 
@@ -175,7 +175,7 @@ d %>%
 
 Finally, the code below provides a quick and dirty visualization of the semantic network (connections via retweet, quote, mention, or reply) found in the data.
 
-```{r fig.height=6, fig.width=9}
+```{r}
 ## unlist observations into long-form data frame
 unlist_df <- function(...) {
   dots <- list(...)
