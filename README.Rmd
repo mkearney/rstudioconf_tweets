@@ -1,0 +1,130 @@
+---
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, collapse = TRUE)
+rstudioconf <- c("rstudioconf", "rstudio::conf", 
+  "rstudioconference", "rstudioconference18", 
+  "rstudioconference2018", "rstudio18", 
+  "rstudioconf18", "rstudioconf2018", 
+  "rstudio::conf18", "rstudio::conf2018")
+```
+
+# rstudio::conf tweets
+
+A repository for tracking [tweets](https://twitter.com/hashtag/rstudioconf?f=tweets&vertical=default&src=hash) about [rstudio::conf 2018](https://www.rstudio.com/conference/).
+
+## rtweet
+
+To make it easier to request data from Twitter's APIs, install [if it's not already] and load [rtweet](http://rtweet.info).
+
+```{r}
+## install rtweet if not already
+if (!requireNamespace("rtweet", quietly = TRUE)) {
+  install.packages("rtweet")
+}
+
+## load rtweet
+library(rtweet)
+```
+
+## Stream
+
+There are two easy ways to get Twitter data filtered by one or more keywords. The first way is to stream the data (using Twitter's stream API). For example, in the code below, a stream is setup to run continuously from the moment its executed until the Saturday at midnight (to roughly coincide with the end of the conference).
+
+```{r, eval=FALSE}
+## set stream time
+timeout <- as.numeric(
+  difftime(as.POSIXct("2018-02-04 00:00:00"),
+  Sys.time(), tz = "US/Pacific", "secs")
+)
+
+## search terms
+rstudioconf <- c("rstudioconf", "rstudio::conf", 
+  "rstudioconference", "rstudioconference18", 
+  "rstudioconference2018", "rstudio18", 
+  "rstudioconf18", "rstudioconf2018", 
+  "rstudio::conf18", "rstudio::conf2018")
+
+## name of file to save output
+json_file <- file.path("data", "stream.json")
+
+## stream the tweets and write to "data/stream.json"
+stream_tweets(
+  q = paste(rstudioconf, collapse = ","), 
+  timeout = timeout,
+  file_name = json_file,
+  parse = FALSE
+)
+
+## parse json data and convert to tibble
+rt <- parse_stream(json_file)
+```
+
+## Search
+
+The second easy way to gather Twitter data using one or more keywords is to search for the data (using Twitter's REST API). Unlike streaming, searching makes it possible to go back in time. Unfortunately, Twitter sets a rather restrictive cap–roughly nine days–on how far back you can go. Regardless, searching for tweets is often the preferred method. For example, the code below is setup in such a way that it can be executed once [or even several times] a day throughout the conference.
+
+```{r, cahce=TRUE}
+## search for up to 100,000 tweets mentionging rstudio::conf
+rt <- search_tweets(
+  paste(rstudioconf, collapse = " OR "), 
+  n = 1e5, verbose = FALSE,
+  retryonratelimit = TRUE
+)
+
+## if there's already a search data file saved, then read it in,
+## drop the duplicates, and then update the `rt` data object
+if (file.exists(file.path("data", "search.rds"))) {
+  
+  ## bind rows (for tweets AND users data)
+  rt <- do_call_rbind(
+    list(rt, readRDS(file.path("data", "search.rds"))))
+
+  ## determine whether each observation has a unique status ID
+  kp <- !duplicated(rt$status_id)
+  
+  ## only keep rows (observations) with unique status IDs
+  users <- users_data(rt)[kp, ]
+  
+  ## the rows of users should correspond with the tweets
+  rt <- rt[kp, ]
+  
+  ## restore as users attribute
+  attr(rt, "users") <- users
+}
+
+## save the data
+saveRDS(rt, file.path("data", "search.rds"))
+```
+
+## Explore
+
+To explore the Twitter data, go ahead and load the [tidyverse](http://tidyverse.org) packages.
+
+```{r}
+suppressPackageStartupMessages(library(tidyverse))
+```
+
+### Tweet frequency over time
+
+In the code below, the data is summarized into a time series-like data frame and then plotted in order depict the frequency of tweets–aggregated in two-hour intevals–about rstudio::conf over time.
+
+```{r fig.height=6, fig.width=9}
+rt %>%
+  ts_plot("2 hours", color = "transparent") +
+  geom_smooth(method = "loess", se = FALSE, span = .25, 
+  size = 2, colour = "#0066aa") +
+  geom_point(size = 5,
+    shape = 21, fill = "#ADFF2F99", colour = "#000000dd") + 
+  theme_minimal(base_size = 15, base_family = "Roboto Condensed") + 
+  theme(axis.text = element_text(colour = "#222222"), 
+    plot.title = element_text(size = rel(1.7), face = "bold"),
+    plot.subtitle = element_text(size = rel(1.3)),
+    plot.caption = element_text(colour = "#444444")) + 
+  labs(title = "Frequency of tweets about rstudio::conf over time",
+    subtitle = "Twitter status counts aggregated using two-hour intervals", 
+    caption = "\n\nSource: Data gathered via Twitter's standard `search/tweets` API using rtweet",
+    x = NULL, y = NULL)
+```
