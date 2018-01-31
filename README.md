@@ -59,6 +59,13 @@ Search
 The second easy way to gather Twitter data using one or more keywords is to search for the data (using Twitter's REST API). Unlike streaming, searching makes it possible to go back in time. Unfortunately, Twitter sets a rather restrictive cap–roughly nine days–on how far back you can go. Regardless, searching for tweets is often the preferred method. For example, the code below is setup in such a way that it can be executed once \[or even several times\] a day throughout the conference.
 
 ``` r
+## search terms
+rstudioconf <- c("rstudioconf", "rstudio::conf", 
+  "rstudioconference", "rstudioconference18", 
+  "rstudioconference2018", "rstudio18", 
+  "rstudioconf18", "rstudioconf2018", 
+  "rstudio::conf18", "rstudio::conf2018")
+
 ## search for up to 100,000 tweets mentionging rstudio::conf
 rt <- search_tweets(
   paste(rstudioconf, collapse = " OR "), 
@@ -122,8 +129,9 @@ rt %>%
     x = NULL, y = NULL)
 ```
 
-![](README_files/figure-markdown_github/unnamed-chunk-5-1.png)
-
+<p style="text-align:center;">
+<img src="README_files/figure-markdown_github/unnamed-chunk-5-1.png" < /img>
+</p>
 ### Positive/negative sentiment
 
 Next, some sentiment analysis of the tweets so far.
@@ -165,8 +173,9 @@ d %>%
     caption = "\n\nSource: Data gathered using rtweet. Sentiment analysis done using syuzhet")
 ```
 
-![](README_files/figure-markdown_github/unnamed-chunk-6-1.png)
-
+<p style="text-align:center;">
+<img src="README_files/figure-markdown_github/unnamed-chunk-6-1.png" < /img>
+</p>
 ### Semantic networks
 
 Finally, the code below provides a quick and dirty visualization of the semantic network (connections via retweet, quote, mention, or reply) found in the data.
@@ -220,4 +229,6 @@ plot(g,
   edge.width = .4)
 ```
 
-![](README_files/figure-markdown_github/unnamed-chunk-7-1.png)
+<p style="text-align:center;">
+<img src="README_files/figure-markdown_github/unnamed-chunk-7-1.png" < /img>
+</p>
