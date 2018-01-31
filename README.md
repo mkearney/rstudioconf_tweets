@@ -25,12 +25,13 @@ Data
 Two data collection methods are described in detail below. Hoewver, if you want to skip straight to the data, run the following code:
 
 ``` r
-## read status IDs from raw github rds file
+## download status IDs file
 download.file(
   "https://github.com/mkearney/rstudioconf_tweets/blob/master/data/search-ids.rds?raw=true",
   "rstudioconf_search-ids.rds"
 )
 
+## read status IDs fromdownloaded file
 ids <- readRDS("rstudioconf_search-ids.rds")
 
 ## lookup data associated with status ids
