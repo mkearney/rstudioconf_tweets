@@ -154,6 +154,7 @@ rt %>%
 <p align="center">
 <img width="100%" height="auto" src="README_files/figure-markdown_github/unnamed-chunk-6-1.png" />
 </p>
+ 
 
 ### Positive/negative sentiment
 
