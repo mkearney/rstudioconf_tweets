@@ -127,8 +127,6 @@ To explore the Twitter data, go ahead and load the [tidyverse](http://tidyverse.
 
 ``` r
 suppressPackageStartupMessages(library(tidyverse))
-## Warning: package 'tibble' was built under R version 3.4.3
-## Warning: package 'tidyr' was built under R version 3.4.3
 ```
 
 ### Tweet frequency over time
