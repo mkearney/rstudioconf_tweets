@@ -154,7 +154,7 @@ rt %>%
 ```
 
 <p align="center">
-<img width="100%" src="README_files/figure-markdown_github/unnamed-chunk-6-1.png" />
+<img width="100%" height="auto" src="README_files/figure-markdown_github/unnamed-chunk-6-1.png" />
 </p>
 ### Positive/negative sentiment
 
@@ -205,7 +205,7 @@ rt %>%
 ```
 
 <p align="center">
-<img width="100%" src="README_files/figure-markdown_github/unnamed-chunk-7-1.png" />
+<img width="100%" height="auto" src="README_files/figure-markdown_github/unnamed-chunk-7-1.png" />
 </p>
 ### Semantic networks
 
@@ -282,5 +282,5 @@ mtext("User connections by mentions, replies, retweets, and quotes",
 ```
 
 <p align="center">
-<img width="100%" src="README_files/figure-markdown_github/unnamed-chunk-8-1.png" />
+<img width="100%" height="auto" src="README_files/figure-markdown_github/unnamed-chunk-8-1.png" />
 </p>

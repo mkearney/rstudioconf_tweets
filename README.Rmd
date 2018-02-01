@@ -134,7 +134,7 @@ suppressPackageStartupMessages(library(tidyverse))
 
 In the code below, the data is summarized into a time series-like data frame and then plotted in order depict the frequency of tweets–aggregated in two-hour intevals–about rstudio::conf over time.
 
-```{r fig.show='hide', fig.height=6, fig.width=9}
+```{r fig.show='hide', fig.height=7, fig.width=9}
 rt %>%
   ts_plot("2 hours", color = "transparent") +
   geom_smooth(method = "loess", se = FALSE, span = .25,
@@ -153,14 +153,14 @@ rt %>%
 ```
 
 <p align="center">
-<img width="100%" src="README_files/figure-markdown_github/unnamed-chunk-6-1.png" />
+<img width="100%" height="auto" src="README_files/figure-markdown_github/unnamed-chunk-6-1.png" />
 </p>
 
 ### Positive/negative sentiment
 
 Next, some sentiment analysis of the tweets so far.
 
-```{r fig.show='hide', fig.height=6, fig.width=9}
+```{r fig.show='hide', fig.height=7, fig.width=9}
 ## clean up the text a bit (rm mentions and links)
 rt$text2 <- gsub(
   "^RT:?\\s{0,}|#|@\\S+|https?[[:graph:]]", "", rt$text)
@@ -205,7 +205,7 @@ rt %>%
 ```
 
 <p align="center">
-<img width="100%" src="README_files/figure-markdown_github/unnamed-chunk-7-1.png" />
+<img width="100%" height="auto" src="README_files/figure-markdown_github/unnamed-chunk-7-1.png" />
 </p>
 
 ### Semantic networks
@@ -283,5 +283,5 @@ mtext("User connections by mentions, replies, retweets, and quotes",
 ```
 
 <p align="center">
-<img width="100%" src="README_files/figure-markdown_github/unnamed-chunk-8-1.png" />
+<img width="100%" height="auto" src="README_files/figure-markdown_github/unnamed-chunk-8-1.png" />
 </p>
