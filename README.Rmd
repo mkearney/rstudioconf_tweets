@@ -184,10 +184,9 @@ rt %>%
   mutate(time = round_time(created_at, 60 * 60)) %>%
   group_by(time) %>%
   summarise(sentiment = mean(sentiment, na.rm = TRUE)) %>%
-  mutate(
-    valence = ifelse(sentiment > 0L, "Positive", "Negative")) %>%
+  mutate(valence = ifelse(sentiment > 0L, "Positive", "Negative")) %>%
   ggplot(aes(x = time, y = sentiment)) +
-  geom_smooth(method = "loess", span = .2,
+  geom_smooth(method = "loess", span = .1,
     colour = "#aa11aadd", fill = "#bbbbbb11") +
   geom_point(aes(fill = valence, colour = valence), 
     shape = 21, alpha = .6, size = 3.5) +
@@ -200,9 +199,9 @@ rt %>%
   scale_fill_manual(values = c(Positive = "#2244ee", Negative = "#dd2222")) +
   scale_colour_manual(values = c(Positive = "#001155", Negative = "#550000")) +
   labs(x = NULL, y = NULL,
-       title = "Sentiment (valence) of rstudio::conf tweets over time",
-       subtitle = "Mean sentiment of tweets aggregated in one-hour intervals",
-    caption = "\n\nSource: Data gathered using rtweet. Sentiment analysis done using syuzhet")
+    title = "Sentiment (valence) of rstudio::conf tweets over time",
+    subtitle = "Mean sentiment of tweets aggregated in one-hour intervals",
+    caption = "\nSource: Data gathered using rtweet. Sentiment analysis done using syuzhet")
 ```
 
 <p align="center">
@@ -213,7 +212,7 @@ rt %>%
 
 Finally, the code below provides a quick and dirty visualization of the semantic network (connections via retweet, quote, mention, or reply) found in the data.
 
-```{r fig.show='hide', fig.height=16, fig.width=16}
+```{r fig.show='hide', fig.height=36, fig.width=36}
 ## unlist observations into long-form data frame
 unlist_df <- function(...) {
   dots <- lapply(list(...), unlist)
@@ -236,7 +235,7 @@ rdf <- tidyr::gather(rdf, interaction_type, to_screen_name, -from_screen_name)
 mat <- as.matrix(rdf[, -2])
 mat <- mat[apply(mat, 1, function(i) !any(is.na(i))), ]
 
-## filter out users who don't appeaer in both sides at least once
+## filter out users who don't appear in both sides at least once
 apps1 <- table(mat[, 1])
 apps2 <- table(mat[, 2])
 apps <- names(apps1)[names(apps1) %in% names(apps2)]
@@ -247,40 +246,39 @@ mat <- mat[mat[, 1] %in% apps & mat[, 1] != mat[, 2], ]
 ## create graph object
 g <- igraph::graph_from_edgelist(mat)
 
-## calculate size attriute
+## calculate size attribute (and transform to fit)
 size <- table(c(mat[, 1], mat[, 2]))
+size <- sqrt(size) * 1.25
 
 ## reorder freq table
 size <- size[match(names(size), names(igraph::V(g)))]
 
 ## plot network
-par(mar = c(4, 2, 5, 2))
+par(mar = c(12, 6, 15, 6))
 plot(g,
-  layout = igraph::layout.auto(g),
   edge.size = .4,
   curved = FALSE,
   margin = -.05,
   edge.arrow.size = 0,
   edge.arrow.width = 0,
   vertex.color = "#ADFF2F99",
-  vertex.size = sqrt(size) * 1.75,
+  vertex.size = size,
   vertex.frame.color = "#003366",
   vertex.label.color = "#003366",
-  vertex.label.cex = .75,
+  vertex.label.cex = .8,
   vertex.label.family = "Roboto Condensed",
   edge.color = "#0066aa",
   edge.width = .2,
   main = "")
-par(mar = c(3, 2, 3, 2))
+par(mar = c(9, 6, 9, 6))
 title("Semantic network of users tweeting about rstudio::conf",
-  adj = 0, family = "Roboto Condensed", cex.main = 2.75)
+  adj = 0, family = "Roboto Condensed", cex.main = 6.5)
 mtext("Source: Data gathered using rtweet. Network analysis done using igraph",
-  side = 1, line = 0, adj = 1.0,
-  family = "Roboto Condensed",
-  col = "#222222", cex = 1.6)
+  side = 1, line = 0, adj = 1.0, cex = 3.8,
+  family = "Roboto Condensed", col = "#222222")
 mtext("User connections by mentions, replies, retweets, and quotes",
-  side = 3, line = -1.75, adj = 0,
-  family = "Roboto Condensed", cex = 2.1)
+  side = 3, line = -5, adj = 0,
+  family = "Roboto Condensed", cex = 4.9)
 ```
 
 <p align="center">
