@@ -87,10 +87,19 @@ rstudioconf <- c("rstudioconf", "rstudio::conf",
   "rstudioconf18", "rstudioconf2018",
   "rstudio::conf18", "rstudio::conf2018")
 
+## use since_id from previous search (if exists)
+if (file.exists(file.path("data", "search.rds"))) {
+  since_id <- readRDS(file.path("data", "search.rds"))
+  since_id <- since_id$status_id[1]
+} else {
+  since_id <- NULL
+}
+
 ## search for up to 100,000 tweets mentionging rstudio::conf
 rt <- search_tweets(
   paste(rstudioconf, collapse = " OR "),
   n = 1e5, verbose = FALSE,
+  since_id = since_id,
   retryonratelimit = TRUE
 )
 
