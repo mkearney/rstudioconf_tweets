@@ -291,3 +291,39 @@ mtext("User connections by mentions, replies, retweets, and quotes",
 <p align="center">
 <img width="100%" height="auto" src="README_files/figure-markdown_github/unnamed-chunk-8-1.png" />
 </p>
+``` r
+rt %>%
+  filter(created_at > "2018-02-01") %>%
+  mutate(
+    text = tolower(text),
+    tidyverse = str_detect(
+      text, "dplyr|tidyeval|tidyverse|rlang|map|purrr|readr|tibble"),
+    shiny = str_detect(text, "shiny")
+  ) %>%
+  select(created_at, tidyverse:shiny) %>%
+  gather(pkg, mention, -created_at) %>%
+  mutate(pkg = factor(pkg, labels = c("Shiny", "Tidyverse"))) %>%
+  filter(mention) %>%
+  group_by(pkg) %>%
+  ts_plot("2 hours") +
+  geom_point(shape = 21, size = 3, aes(fill = pkg)) + 
+  theme_minimal(base_family = "Roboto Condensed") + 
+  scale_x_datetime(timezone = "America/Los_Angelos") + 
+  theme(legend.position = "bottom",
+    legend.title = element_blank(),
+    legend.text = element_text(size = rel(1.1)),
+    axis.text = element_text(colour = "#222222"),
+    plot.title = element_text(size = rel(1.7), face = "bold"),
+    plot.subtitle = element_text(size = rel(1.3)),
+    plot.caption = element_text(colour = "#444444")) +
+  scale_fill_manual(values = c(Tidyverse = "#2244ee", Shiny = "#dd2222")) +
+  scale_colour_manual(values = c(Tidyverse = "#001155", Shiny = "#550000")) +
+  labs(x = NULL, y = NULL,
+    title = "Frequency of tweets about Tidyverse and Shiny during rstudio::conf",
+    subtitle = "Tweet counts aggregated for each topic in two-hour intervals",
+    caption = "\nSource: Data gathered using rtweet. Made pretty by ggplot2.")
+```
+
+<p align="center">
+<img width="100%" height="auto" src="README_files/figure-markdown_github/unnamed-chunk-9-1.png" />
+</p>
