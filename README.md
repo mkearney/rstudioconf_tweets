@@ -140,10 +140,11 @@ suppressPackageStartupMessages(library(tidyverse))
 
 ### Tweet frequency over time
 
-In the code below, the data is summarized into a time series-like data frame and then plotted in order depict the frequency of tweets–aggregated in two-hour intevals–about rstudio::conf over time.
+In the code below, the data is summarized into a time series-like data frame and then plotted in order depict the frequency of tweets–aggregated using 2-hour intevals–about rstudio::conf over time.
 
 ``` r
 rt %>%
+  filter(created_at > "2018-01-29") %>%
   ts_plot("2 hours", color = "transparent") +
   geom_smooth(method = "loess", se = FALSE, span = .25,
   size = 2, colour = "#0066aa") +
@@ -303,179 +304,194 @@ Ideally, the network visualization would be an interactive, searchable graphic. 
 
 ``` r
 print(as_tibble(sort(size, decreasing = TRUE)), n = length(size))
-## # A tibble: 170 x 2
+## # A tibble: 185 x 2
 ##     screen_name         n
 ##     <chr>           <dbl>
-##   1 hadleywickham   8.65 
-##   2 robinson_es     7.41 
-##   3 rstudio         7.02 
-##   4 drob            6.47 
-##   5 LucyStats       6.10 
-##   6 AmeliaMN        5.61 
-##   7 juliasilge      5.59 
-##   8 stephhazlitt    5.19 
-##   9 visnut          4.95 
-##  10 dataandme       4.95 
-##  11 Voovarb         4.77 
-##  12 EmilyRiederer   4.73 
-##  13 thmscwlls       4.73 
-##  14 JennyBryan      4.64 
-##  15 d4tagirl        4.58 
-##  16 datapointier    4.51 
-##  17 CivicAngela     4.46 
-##  18 romain_francois 4.46 
-##  19 kearneymw       4.42 
-##  20 njogukennly     4.40 
-##  21 RLadiesGlobal   4.18 
-##  22 sharon000       4.16 
-##  23 elhazen         4.08 
-##  24 malco_bearhat   4.05 
-##  25 minebocek       4.00 
-##  26 SK_convergence  4.00 
-##  27 tanyacash21     3.86 
-##  28 CMastication    3.84 
-##  29 old_man_chester 3.81 
-##  30 sharlagelfand   3.78 
-##  31 CorradoLanera   3.78 
-##  32 edzerpebesma    3.72 
-##  33 juliesquid      3.72 
-##  34 eamcvey         3.63 
-##  35 astroeringrand  3.63 
-##  36 thomasp85       3.57 
-##  37 kara_woo        3.50 
-##  38 cpsievert       3.23 
-##  39 RLadiesBA       3.23 
-##  40 _RCharlie       3.23 
-##  41 dvaughan32      3.19 
-##  42 yutannihilation 3.19 
-##  43 nic_crane       3.16 
-##  44 kierisi         3.16 
-##  45 taraskaduk      3.12 
-##  46 nj_tierney      3.08 
-##  47 theRcast        3.00 
-##  48 gdequeiroz      2.92 
-##  49 ellisvalentiner 2.92 
-##  50 cantoflor_87    2.92 
-##  51 MangoTheCat     2.83 
-##  52 Dorris_Scott    2.83 
-##  53 ntweetor        2.83 
-##  54 aindap          2.79 
-##  55 kevin_ushey     2.79 
-##  56 RLadiesMVD      2.79 
-##  57 jessenleon      2.74 
-##  58 shermstats      2.74 
-##  59 jafflerbach     2.74 
-##  60 therriaultphd   2.74 
-##  61 bizScienc       2.69 
-##  62 tnederlof       2.69 
-##  63 jasongrahn      2.64 
-##  64 daattali        2.64 
-##  65 BaumerBen       2.64 
-##  66 conjja          2.64 
-##  67 duto_guerra     2.59 
-##  68 Denironyx       2.59 
-##  69 krlmlr          2.59 
-##  70 JonathanZadra   2.54 
-##  71 alice_data      2.54 
-##  72 plzbeemyfriend  2.54 
-##  73 NovasTaylor     2.54 
-##  74 ajmcoqui        2.54 
-##  75 patsellers      2.54 
-##  76 alandipert      2.49 
-##  77 ijlyttle        2.43 
-##  78 mfairbrocanada  2.43 
-##  79 sgrifter        2.43 
-##  80 SDanielZafar1   2.38 
-##  81 jamie_jezebel   2.38 
-##  82 sheilasaia      2.38 
-##  83 ma_salmon       2.38 
-##  84 deekareithi     2.38 
-##  85 danielphadley   2.32 
-##  86 Bluelion0305    2.26 
-##  87 jarvmiller      2.26 
-##  88 chrisderv       2.26 
-##  89 hugobowne       2.26 
-##  90 grrrck          2.19 
-##  91 ibddoctor       2.19 
-##  92 RLadiesOrlando  2.19 
-##  93 markroepke      2.19 
-##  94 pacocuak        2.19 
-##  95 hrbrmstr        2.13 
-##  96 seankross       2.13 
-##  97 jimhester_      2.06 
-##  98 darokun         2.06 
-##  99 millerdl        2.06 
-## 100 OHIscience      2.06 
-## 101 Blair09M        1.98 
-## 102 kyrietree       1.98 
-## 103 dnlmc           1.98 
-## 104 zevross         1.98 
-## 105 drvnanduri      1.90 
-## 106 math_dominick   1.90 
-## 107 kpivert         1.90 
-## 108 paylakatel      1.90 
-## 109 DoITBoston      1.90 
-## 110 wmlandau        1.90 
-## 111 tcbanalytics    1.90 
-## 112 hspter          1.82 
-## 113 revodavid       1.82 
-## 114 just_add_data   1.82 
-## 115 DJShearwater    1.73 
-## 116 MineDogucu      1.73 
-## 117 chrisalbon      1.73 
-## 118 jent103         1.73 
-## 119 n_ashutosh      1.73 
-## 120 egolinko        1.64 
-## 121 jakethomp       1.64 
-## 122 R_by_Ryo        1.64 
-## 123 JeanetheFalvey  1.64 
-## 124 harry_seunghoon 1.64 
-## 125 alichiang13     1.64 
-## 126 ParmutiaMakui   1.64 
-## 127 aaronchall      1.53 
-## 128 simecek         1.53 
-## 129 jdblischak      1.53 
-## 130 LuisDVerde      1.53 
-## 131 maryclaryf      1.53 
-## 132 uncmbbtrivia    1.53 
-## 133 samhinshaw      1.41 
-## 134 abresler        1.41 
-## 135 nicoleradziwill 1.41 
-## 136 OmniaRaouf      1.41 
-## 137 JonTheGeek      1.41 
-## 138 jebyrnes        1.28 
-## 139 butterflyology  1.28 
-## 140 RobynLBall      1.28 
-## 141 runnersbyte     1.28 
-## 142 tonyfujs        1.28 
-## 143 ledell          1.28 
-## 144 kwbroman        1.28 
-## 145 VParrillaAixela 1.28 
-## 146 rweekly_org     1.28 
-## 147 msciain         1.13 
-## 148 ROfficeHours    1.13 
-## 149 sgpln           1.13 
-## 150 TrestleJeff     1.13 
-## 151 RLadiesColumbus 1.13 
-## 152 claytonyochum   1.13 
-## 153 CaltechChemLib  1.13 
-## 154 AriLamstein     1.13 
-## 155 canoodleson     1.13 
-## 156 dobbleobble     1.13 
-## 157 bogdanrau       1.13 
-## 158 jhollist        1.13 
-## 159 RLadiesTC       1.13 
-## 160 lariebyrd       0.944
-## 161 ukacz           0.944
-## 162 jomilo75        0.944
-## 163 harrismcgehee   0.702
-## 164 volha_tryputsen 0.702
-## 165 bj_bloom        0.702
-## 166 jaredlander     0.702
-## 167 awunderground   0.702
-## 168 Md_Harris       0.333
-## 169 ucdlevy         0.333
-## 170 s_pearce        0.333
+##   1 hadleywickham   8.99 
+##   2 robinson_es     7.77 
+##   3 rstudio         7.58 
+##   4 drob            6.72 
+##   5 RLadiesGlobal   6.47 
+##   6 juliasilge      6.34 
+##   7 LucyStats       6.23 
+##   8 AmeliaMN        5.75 
+##   9 JennyBryan      5.30 
+##  10 stephhazlitt    5.28 
+##  11 d4tagirl        5.28 
+##  12 dataandme       5.08 
+##  13 visnut          5.01 
+##  14 EmilyRiederer   4.99 
+##  15 romain_francois 4.91 
+##  16 thmscwlls       4.89 
+##  17 Voovarb         4.89 
+##  18 CivicAngela     4.73 
+##  19 sharon000       4.62 
+##  20 kearneymw       4.55 
+##  21 njogukennly     4.53 
+##  22 datapointier    4.51 
+##  23 SK_convergence  4.25 
+##  24 minebocek       4.21 
+##  25 sharlagelfand   4.18 
+##  26 CorradoLanera   4.10 
+##  27 elhazen         4.08 
+##  28 tanyacash21     4.05 
+##  29 malco_bearhat   4.05 
+##  30 eamcvey         4.00 
+##  31 kara_woo        3.95 
+##  32 CMastication    3.95 
+##  33 old_man_chester 3.89 
+##  34 juliesquid      3.89 
+##  35 edzerpebesma    3.78 
+##  36 thomasp85       3.78 
+##  37 astroeringrand  3.72 
+##  38 kierisi         3.54 
+##  39 gdequeiroz      3.44 
+##  40 RLadiesBA       3.44 
+##  41 theRcast        3.41 
+##  42 _RCharlie       3.37 
+##  43 nic_crane       3.27 
+##  44 cpsievert       3.23 
+##  45 cantoflor_87    3.23 
+##  46 dvaughan32      3.19 
+##  47 nj_tierney      3.19 
+##  48 yutannihilation 3.19 
+##  49 ajmcoqui        3.16 
+##  50 MangoTheCat     3.12 
+##  51 taraskaduk      3.12 
+##  52 grrrck          3.12 
+##  53 RLadiesMVD      3.04 
+##  54 jessenleon      3.00 
+##  55 jasongrahn      3.00 
+##  56 kevin_ushey     2.96 
+##  57 shermstats      2.96 
+##  58 Bluelion0305    2.92 
+##  59 alice_data      2.92 
+##  60 ellisvalentiner 2.92 
+##  61 jafflerbach     2.87 
+##  62 Denironyx       2.87 
+##  63 ntweetor        2.87 
+##  64 Dorris_Scott    2.83 
+##  65 therriaultphd   2.83 
+##  66 bhive01         2.83 
+##  67 aindap          2.79 
+##  68 sellorm         2.69 
+##  69 bizScienc       2.69 
+##  70 tnederlof       2.69 
+##  71 duto_guerra     2.64 
+##  72 daattali        2.64 
+##  73 patsellers      2.64 
+##  74 BaumerBen       2.64 
+##  75 conjja          2.64 
+##  76 Blair09M        2.59 
+##  77 mfairbrocanada  2.59 
+##  78 krlmlr          2.59 
+##  79 JonathanZadra   2.54 
+##  80 alandipert      2.54 
+##  81 plzbeemyfriend  2.54 
+##  82 NovasTaylor     2.54 
+##  83 sgrifter        2.49 
+##  84 jamie_jezebel   2.43 
+##  85 RLadiesOrlando  2.43 
+##  86 ijlyttle        2.43 
+##  87 jarvmiller      2.43 
+##  88 sheilasaia      2.43 
+##  89 SDanielZafar1   2.38 
+##  90 ma_salmon       2.38 
+##  91 deekareithi     2.38 
+##  92 drvnanduri      2.32 
+##  93 danielphadley   2.32 
+##  94 millerdl        2.32 
+##  95 zevross         2.32 
+##  96 just_add_data   2.26 
+##  97 chrisderv       2.26 
+##  98 hugobowne       2.26 
+##  99 ibddoctor       2.19 
+## 100 MineDogucu      2.19 
+## 101 markroepke      2.19 
+## 102 pacocuak        2.19 
+## 103 hrbrmstr        2.13 
+## 104 seankross       2.13 
+## 105 jimhester_      2.06 
+## 106 dnlmc           2.06 
+## 107 jent103         2.06 
+## 108 darokun         2.06 
+## 109 OHIscience      2.06 
+## 110 hspter          1.98 
+## 111 DoITBoston      1.98 
+## 112 paylakatel      1.98 
+## 113 kyrietree       1.98 
+## 114 math_dominick   1.90 
+## 115 kpivert         1.90 
+## 116 wmlandau        1.90 
+## 117 tcbanalytics    1.90 
+## 118 RhoBott         1.82 
+## 119 simecek         1.82 
+## 120 jakethomp       1.82 
+## 121 egolinko        1.82 
+## 122 revodavid       1.82 
+## 123 DJShearwater    1.73 
+## 124 mmmpork         1.73 
+## 125 LuisDVerde      1.73 
+## 126 chrisalbon      1.73 
+## 127 n_ashutosh      1.73 
+## 128 JonTheGeek      1.64 
+## 129 nicoleradziwill 1.64 
+## 130 OmniaRaouf      1.64 
+## 131 R_by_Ryo        1.64 
+## 132 JeanetheFalvey  1.64 
+## 133 harry_seunghoon 1.64 
+## 134 alichiang13     1.64 
+## 135 ParmutiaMakui   1.64 
+## 136 RLadiesNYC      1.53 
+## 137 _NickGolding_   1.53 
+## 138 aaronchall      1.53 
+## 139 AllenDowney     1.53 
+## 140 lariebyrd       1.53 
+## 141 jdblischak      1.53 
+## 142 maryclaryf      1.53 
+## 143 uncmbbtrivia    1.53 
+## 144 msciain         1.41 
+## 145 samhinshaw      1.41 
+## 146 abresler        1.41 
+## 147 zymla           1.41 
+## 148 TrestleJeff     1.41 
+## 149 Nujcharee       1.41 
+## 150 jebyrnes        1.28 
+## 151 butterflyology  1.28 
+## 152 RobynLBall      1.28 
+## 153 runnersbyte     1.28 
+## 154 tonyfujs        1.28 
+## 155 ledell          1.28 
+## 156 kwbroman        1.28 
+## 157 VParrillaAixela 1.28 
+## 158 rweekly_org     1.28 
+## 159 ROfficeHours    1.13 
+## 160 sgpln           1.13 
+## 161 olgavitek       1.13 
+## 162 eirenkate       1.13 
+## 163 KurggMantra     1.13 
+## 164 RLadiesColumbus 1.13 
+## 165 claytonyochum   1.13 
+## 166 CaltechChemLib  1.13 
+## 167 AriLamstein     1.13 
+## 168 canoodleson     1.13 
+## 169 dobbleobble     1.13 
+## 170 bogdanrau       1.13 
+## 171 jhollist        1.13 
+## 172 RLadiesTC       1.13 
+## 173 ucdlevy         0.944
+## 174 ukacz           0.944
+## 175 jomilo75        0.944
+## 176 EricLeeKrantz   0.702
+## 177 benjamingreve   0.702
+## 178 harrismcgehee   0.702
+## 179 javierluraschi  0.702
+## 180 volha_tryputsen 0.702
+## 181 bj_bloom        0.702
+## 182 jaredlander     0.702
+## 183 awunderground   0.702
+## 184 Md_Harris       0.333
+## 185 s_pearce        0.333
 ```
 
 ### Tidyverse vs. Shiny
@@ -533,7 +549,7 @@ source(file.path("R", "words.R"))
 This first word cloud depicts the most popular non-stopwords used in tweets about Shiny.
 
 ``` r
-par(mar = c(2, 2, 2, 2))
+par(mar = c(0, 0, 0, 0))
 wordcloud::wordcloud(
   shiny$var, shiny$n, min.freq = 3,
   random.order = FALSE,
@@ -552,9 +568,9 @@ wordcloud::wordcloud(
 The second word cloud depicts the most popular non-stopwords used in tweets about the tidyverse.
 
 ``` r
-par(mar = c(2, 2, 2, 2))
+par(mar = c(0, 0, 0, 0))
 wordcloud::wordcloud(
-  tidyverse$var, tidyverse$n, min.freq = 4,
+  tidyverse$var, tidyverse$n, min.freq = 5,
   random.order = FALSE,
   random.color = FALSE,
   colors = gg_cols(5)

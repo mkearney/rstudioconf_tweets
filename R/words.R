@@ -1,3 +1,9 @@
+suppressPackageStartupMessages(library(rlang))
+
+trim_ws <- function(x) {
+  x <- gsub("\\s{2,}", " ", x)
+  gsub("^\\s|\\s$", "", x)
+}
 str_split <- function(x, sep, sub = NA_character_, ...) {
   x <- strsplit(x, sep, ...)
   x[lengths(x) == 0L] <- sub
@@ -26,7 +32,9 @@ trim_punct <- function(x) {
 remove_stopwords <- function(x, stopwords = NULL) {
   if (is.null(stopwords)) {
     data("stopwordslangs", package = "rtweet")
-    stopwords <- dplyr::filter(stopwordslangs, lang == "en", p > .9999) %>% pull(word)
+    stopwords <- stopwordslangs %>%
+      dplyr::filter(lang == "en", p > .9999) %>%
+      pull(word)
   }
   wordbreakor <- function(x) {
     x <- paste(x, collapse = "\\s{0,1}\\b|\\b\\s{0,1}")
@@ -34,7 +42,7 @@ remove_stopwords <- function(x, stopwords = NULL) {
   }
   stopwords <- wordbreakor(stopwords)
   x <- gsub(stopwords, " ", x, perl = TRUE, ignore.case = TRUE)
-  trim_ws(x)
+  trimws(x)
 }
 tbl_table <- function(.data, ...) {
   vars <- quos(...)
@@ -48,15 +56,6 @@ tbl_table <- function(.data, ...) {
   tibble::as_tibble(tb)
 }
 
-suppressPackageStartupMessages(library(rlang))
-
-rt$text2 <- gsub(
-  "^RT:?\\s{0,}|#|@\\S+|https?[[:graph:]]+", "", rt$text)
-## convert to lower case
-rt$text2 <- tolower(rt$text2)
-## trim extra white space
-rt$text2 <- gsub("^\\s{1,}|\\s{1,}$", "", rt$text2)
-rt$text2 <- gsub("\\s{2,}", " ", rt$text2)
 rt %>%
   mutate(
     tidyverse = str_detect(
@@ -73,6 +72,7 @@ rt %>%
   group_by(pkg) %>%
   summarise(
     wds = list(arrange(tbl_table(unlist(wds)), -n))) -> rtw
+
 shiny <- rtw$wds[[1]]
 shiny <- filter(shiny, !var %in% c("rstudioconf", "shiny"))
 tidyverse <- rtw$wds[[2]]

@@ -141,10 +141,11 @@ suppressPackageStartupMessages(library(tidyverse))
 
 ### Tweet frequency over time
 
-In the code below, the data is summarized into a time series-like data frame and then plotted in order depict the frequency of tweets–aggregated in two-hour intevals–about rstudio::conf over time.
+In the code below, the data is summarized into a time series-like data frame and then plotted in order depict the frequency of tweets–aggregated using 2-hour intevals–about rstudio::conf over time.
 
 ```{r timefreq, fig.show='hide', fig.height=7, fig.width=9}
 rt %>%
+  filter(created_at > "2018-01-29") %>%
   ts_plot("2 hours", color = "transparent") +
   geom_smooth(method = "loess", se = FALSE, span = .25,
   size = 2, colour = "#0066aa") +
@@ -362,8 +363,8 @@ source(file.path("R", "words.R"))
 
 This first word cloud depicts the most popular non-stopwords used in tweets about Shiny.
 
-```{r shiny, fig.show='hide', fig.height=5, fig.width=7}
-par(mar = c(2, 2, 2, 2))
+```{r shiny, fig.show='hide', fig.height=7, fig.width=7}
+par(mar = c(0, 0, 0, 0))
 wordcloud::wordcloud(
   shiny$var, shiny$n, min.freq = 3,
   random.order = FALSE,
@@ -381,10 +382,10 @@ wordcloud::wordcloud(
 
 The second word cloud depicts the most popular non-stopwords used in tweets about the tidyverse.
 
-```{r tidyverse, fig.show='hide', fig.height=5, fig.width=7}
-par(mar = c(2, 2, 2, 2))
+```{r tidyverse, fig.show='hide', fig.height=7, fig.width=7}
+par(mar = c(0, 0, 0, 0))
 wordcloud::wordcloud(
-  tidyverse$var, tidyverse$n, min.freq = 4,
+  tidyverse$var, tidyverse$n, min.freq = 5,
   random.order = FALSE,
   random.color = FALSE,
   colors = gg_cols(5)
