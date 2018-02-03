@@ -215,9 +215,11 @@ rt %>%
 <p align="center">
 <img width="100%" height="auto" src="README_files/figure-markdown_github/unnamed-chunk-7-1.png" />
 </p>
+ 
+
 ### Semantic networks
 
-Finally, the code below provides a quick and dirty visualization of the semantic network (connections via retweet, quote, mention, or reply) found in the data.
+The code below provides a quick and dirty visualization of the semantic network (connections via retweet, quote, mention, or reply) found in the data.
 
 ``` r
 ## unlist observations into long-form data frame
@@ -291,6 +293,12 @@ mtext("User connections by mentions, replies, retweets, and quotes",
 <p align="center">
 <img width="100%" height="auto" src="README_files/figure-markdown_github/unnamed-chunk-8-1.png" />
 </p>
+ 
+
+### Tidyverse vs. Shiny
+
+This code identifies tweets by topic, detecting mentions of the tidyverse \[packages\] and shiny. It then plots the frequency of those tweets over time.
+
 ``` r
 rt %>%
   filter(created_at > "2018-02-01") %>%
