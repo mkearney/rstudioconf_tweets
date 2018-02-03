@@ -161,7 +161,7 @@ rt %>%
 ```
 
 <p align="center">
-<img width="100%" height="auto" src="README_files/figure-markdown_github/unnamed-chunk-6-1.png" />
+<img width="100%" height="auto" src="README_files/figure-markdown_github/timefreq-1.png" />
 </p>
  
 
@@ -172,7 +172,7 @@ Next, some sentiment analysis of the tweets so far.
 ``` r
 ## clean up the text a bit (rm mentions and links)
 rt$text2 <- gsub(
-  "^RT:?\\s{0,}|#|@\\S+|https?[[:graph:]]", "", rt$text)
+  "^RT:?\\s{0,}|#|@\\S+|https?[[:graph:]]+", "", rt$text)
 ## convert to lower case
 rt$text2 <- tolower(rt$text2)
 ## trim extra white space
@@ -213,7 +213,7 @@ rt %>%
 ```
 
 <p align="center">
-<img width="100%" height="auto" src="README_files/figure-markdown_github/unnamed-chunk-7-1.png" />
+<img width="100%" height="auto" src="README_files/figure-markdown_github/sentiment-1.png" />
 </p>
  
 
@@ -244,20 +244,24 @@ rdf <- tidyr::gather(rdf, interaction_type, to_screen_name, -from_screen_name)
 mat <- as.matrix(rdf[, -2])
 mat <- mat[apply(mat, 1, function(i) !any(is.na(i))), ]
 
-## filter out users who don't appear in both sides at least once
-apps1 <- table(mat[, 1])
-apps2 <- table(mat[, 2])
-apps <- names(apps1)[names(apps1) %in% names(apps2)]
+## get rid of self references
+mat <- mat[mat[, 1] != mat[, 2], ]
 
-## filter and convert to matrix
-mat <- mat[mat[, 1] %in% apps & mat[, 1] != mat[, 2], ]
+## filter out users who don't appear in RHS at least 3 times
+apps1 <- table(mat[, 1])
+apps1 <- apps1[apps1 > 1L]
+apps2 <- table(mat[, 2])
+apps2 <- apps2[apps2 > 1L]
+apps <- names(apps1)[names(apps1) %in% names(apps2)]
+mat <- mat[mat[, 1] %in% apps & mat[, 2] %in% apps, ]
 
 ## create graph object
 g <- igraph::graph_from_edgelist(mat)
 
 ## calculate size attribute (and transform to fit)
-size <- table(c(mat[, 1], mat[, 2]))
-size <- sqrt(size) * 1.25
+matcols <- factor(c(mat[, 1], mat[, 2]), levels = names(igraph::V(g)))
+size <- table(screen_name = matcols)
+size <- (log(size) + sqrt(size)) / 3
 
 ## reorder freq table
 size <- size[match(names(size), names(igraph::V(g)))]
@@ -286,14 +290,193 @@ mtext("Source: Data gathered using rtweet. Network analysis done using igraph",
   side = 1, line = 0, adj = 1.0, cex = 3.8,
   family = "Roboto Condensed", col = "#222222")
 mtext("User connections by mentions, replies, retweets, and quotes",
-  side = 3, line = -5, adj = 0,
+  side = 3, line = -4.25, adj = 0,
   family = "Roboto Condensed", cex = 4.9)
 ```
 
 <p align="center">
-<img width="100%" height="auto" src="README_files/figure-markdown_github/unnamed-chunk-8-1.png" />
+<img width="100%" height="auto" src="README_files/figure-markdown_github/network-1.png" />
 </p>
  
+
+Ideally, the network visualization would be an interactive, searchable graphic. Since it's not, I've printed out the node size values below.
+
+``` r
+print(as_tibble(sort(size, decreasing = TRUE)), n = length(size))
+## # A tibble: 170 x 2
+##     screen_name         n
+##     <chr>           <dbl>
+##   1 hadleywickham   8.65 
+##   2 robinson_es     7.41 
+##   3 rstudio         7.02 
+##   4 drob            6.47 
+##   5 LucyStats       6.10 
+##   6 AmeliaMN        5.61 
+##   7 juliasilge      5.59 
+##   8 stephhazlitt    5.19 
+##   9 visnut          4.95 
+##  10 dataandme       4.95 
+##  11 Voovarb         4.77 
+##  12 EmilyRiederer   4.73 
+##  13 thmscwlls       4.73 
+##  14 JennyBryan      4.64 
+##  15 d4tagirl        4.58 
+##  16 datapointier    4.51 
+##  17 CivicAngela     4.46 
+##  18 romain_francois 4.46 
+##  19 kearneymw       4.42 
+##  20 njogukennly     4.40 
+##  21 RLadiesGlobal   4.18 
+##  22 sharon000       4.16 
+##  23 elhazen         4.08 
+##  24 malco_bearhat   4.05 
+##  25 minebocek       4.00 
+##  26 SK_convergence  4.00 
+##  27 tanyacash21     3.86 
+##  28 CMastication    3.84 
+##  29 old_man_chester 3.81 
+##  30 sharlagelfand   3.78 
+##  31 CorradoLanera   3.78 
+##  32 edzerpebesma    3.72 
+##  33 juliesquid      3.72 
+##  34 eamcvey         3.63 
+##  35 astroeringrand  3.63 
+##  36 thomasp85       3.57 
+##  37 kara_woo        3.50 
+##  38 cpsievert       3.23 
+##  39 RLadiesBA       3.23 
+##  40 _RCharlie       3.23 
+##  41 dvaughan32      3.19 
+##  42 yutannihilation 3.19 
+##  43 nic_crane       3.16 
+##  44 kierisi         3.16 
+##  45 taraskaduk      3.12 
+##  46 nj_tierney      3.08 
+##  47 theRcast        3.00 
+##  48 gdequeiroz      2.92 
+##  49 ellisvalentiner 2.92 
+##  50 cantoflor_87    2.92 
+##  51 MangoTheCat     2.83 
+##  52 Dorris_Scott    2.83 
+##  53 ntweetor        2.83 
+##  54 aindap          2.79 
+##  55 kevin_ushey     2.79 
+##  56 RLadiesMVD      2.79 
+##  57 jessenleon      2.74 
+##  58 shermstats      2.74 
+##  59 jafflerbach     2.74 
+##  60 therriaultphd   2.74 
+##  61 bizScienc       2.69 
+##  62 tnederlof       2.69 
+##  63 jasongrahn      2.64 
+##  64 daattali        2.64 
+##  65 BaumerBen       2.64 
+##  66 conjja          2.64 
+##  67 duto_guerra     2.59 
+##  68 Denironyx       2.59 
+##  69 krlmlr          2.59 
+##  70 JonathanZadra   2.54 
+##  71 alice_data      2.54 
+##  72 plzbeemyfriend  2.54 
+##  73 NovasTaylor     2.54 
+##  74 ajmcoqui        2.54 
+##  75 patsellers      2.54 
+##  76 alandipert      2.49 
+##  77 ijlyttle        2.43 
+##  78 mfairbrocanada  2.43 
+##  79 sgrifter        2.43 
+##  80 SDanielZafar1   2.38 
+##  81 jamie_jezebel   2.38 
+##  82 sheilasaia      2.38 
+##  83 ma_salmon       2.38 
+##  84 deekareithi     2.38 
+##  85 danielphadley   2.32 
+##  86 Bluelion0305    2.26 
+##  87 jarvmiller      2.26 
+##  88 chrisderv       2.26 
+##  89 hugobowne       2.26 
+##  90 grrrck          2.19 
+##  91 ibddoctor       2.19 
+##  92 RLadiesOrlando  2.19 
+##  93 markroepke      2.19 
+##  94 pacocuak        2.19 
+##  95 hrbrmstr        2.13 
+##  96 seankross       2.13 
+##  97 jimhester_      2.06 
+##  98 darokun         2.06 
+##  99 millerdl        2.06 
+## 100 OHIscience      2.06 
+## 101 Blair09M        1.98 
+## 102 kyrietree       1.98 
+## 103 dnlmc           1.98 
+## 104 zevross         1.98 
+## 105 drvnanduri      1.90 
+## 106 math_dominick   1.90 
+## 107 kpivert         1.90 
+## 108 paylakatel      1.90 
+## 109 DoITBoston      1.90 
+## 110 wmlandau        1.90 
+## 111 tcbanalytics    1.90 
+## 112 hspter          1.82 
+## 113 revodavid       1.82 
+## 114 just_add_data   1.82 
+## 115 DJShearwater    1.73 
+## 116 MineDogucu      1.73 
+## 117 chrisalbon      1.73 
+## 118 jent103         1.73 
+## 119 n_ashutosh      1.73 
+## 120 egolinko        1.64 
+## 121 jakethomp       1.64 
+## 122 R_by_Ryo        1.64 
+## 123 JeanetheFalvey  1.64 
+## 124 harry_seunghoon 1.64 
+## 125 alichiang13     1.64 
+## 126 ParmutiaMakui   1.64 
+## 127 aaronchall      1.53 
+## 128 simecek         1.53 
+## 129 jdblischak      1.53 
+## 130 LuisDVerde      1.53 
+## 131 maryclaryf      1.53 
+## 132 uncmbbtrivia    1.53 
+## 133 samhinshaw      1.41 
+## 134 abresler        1.41 
+## 135 nicoleradziwill 1.41 
+## 136 OmniaRaouf      1.41 
+## 137 JonTheGeek      1.41 
+## 138 jebyrnes        1.28 
+## 139 butterflyology  1.28 
+## 140 RobynLBall      1.28 
+## 141 runnersbyte     1.28 
+## 142 tonyfujs        1.28 
+## 143 ledell          1.28 
+## 144 kwbroman        1.28 
+## 145 VParrillaAixela 1.28 
+## 146 rweekly_org     1.28 
+## 147 msciain         1.13 
+## 148 ROfficeHours    1.13 
+## 149 sgpln           1.13 
+## 150 TrestleJeff     1.13 
+## 151 RLadiesColumbus 1.13 
+## 152 claytonyochum   1.13 
+## 153 CaltechChemLib  1.13 
+## 154 AriLamstein     1.13 
+## 155 canoodleson     1.13 
+## 156 dobbleobble     1.13 
+## 157 bogdanrau       1.13 
+## 158 jhollist        1.13 
+## 159 RLadiesTC       1.13 
+## 160 lariebyrd       0.944
+## 161 ukacz           0.944
+## 162 jomilo75        0.944
+## 163 harrismcgehee   0.702
+## 164 volha_tryputsen 0.702
+## 165 bj_bloom        0.702
+## 166 jaredlander     0.702
+## 167 awunderground   0.702
+## 168 Md_Harris       0.333
+## 169 ucdlevy         0.333
+## 170 s_pearce        0.333
+```
 
 ### Tidyverse vs. Shiny
 
@@ -306,7 +489,7 @@ rt %>%
     text = tolower(text),
     tidyverse = str_detect(
       text, "dplyr|tidyeval|tidyverse|rlang|map|purrr|readr|tibble"),
-    shiny = str_detect(text, "shiny")
+    shiny = str_detect(text, "shiny|dashboard|interactiv")
   ) %>%
   select(created_at, tidyverse:shiny) %>%
   gather(pkg, mention, -created_at) %>%
@@ -333,5 +516,51 @@ rt %>%
 ```
 
 <p align="center">
-<img width="100%" height="auto" src="README_files/figure-markdown_github/unnamed-chunk-9-1.png" />
+<img width="100%" height="auto" src="README_files/figure-markdown_github/topics-1.png" />
+</p>
+ 
+
+### Word clouds
+
+I didn't want to add a bunch more code, so here I'm sourcing the prep work/code I used to get word lists.
+
+``` r
+source(file.path("R", "words.R"))
+```
+
+#### Shiny word cloud
+
+This first word cloud depicts the most popular non-stopwords used in tweets about Shiny.
+
+``` r
+par(mar = c(2, 2, 2, 2))
+wordcloud::wordcloud(
+  shiny$var, shiny$n, min.freq = 3,
+  random.order = FALSE,
+  random.color = FALSE,
+  colors = gg_cols(5)
+)
+```
+
+<p align="center">
+<img width="100%" height="auto" src="README_files/figure-markdown_github/shiny-1.png" />
+</p>
+ 
+
+#### Tidyverse word cloud
+
+The second word cloud depicts the most popular non-stopwords used in tweets about the tidyverse.
+
+``` r
+par(mar = c(2, 2, 2, 2))
+wordcloud::wordcloud(
+  tidyverse$var, tidyverse$n, min.freq = 4,
+  random.order = FALSE,
+  random.color = FALSE,
+  colors = gg_cols(5)
+)
+```
+
+<p align="center">
+<img width="100%" height="auto" src="README_files/figure-markdown_github/tidyverse-1.png" />
 </p>

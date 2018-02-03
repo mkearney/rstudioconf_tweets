@@ -143,7 +143,7 @@ suppressPackageStartupMessages(library(tidyverse))
 
 In the code below, the data is summarized into a time series-like data frame and then plotted in order depict the frequency of tweets–aggregated in two-hour intevals–about rstudio::conf over time.
 
-```{r fig.show='hide', fig.height=7, fig.width=9}
+```{r timefreq, fig.show='hide', fig.height=7, fig.width=9}
 rt %>%
   ts_plot("2 hours", color = "transparent") +
   geom_smooth(method = "loess", se = FALSE, span = .25,
@@ -162,7 +162,7 @@ rt %>%
 ```
 
 
-<p align="center"><img width="100%" height="auto" src="README_files/figure-markdown_github/unnamed-chunk-6-1.png" /></p>
+<p align="center"><img width="100%" height="auto" src="README_files/figure-markdown_github/timefreq-1.png" /></p>
 
 &nbsp;
 
@@ -170,10 +170,10 @@ rt %>%
 
 Next, some sentiment analysis of the tweets so far.
 
-```{r fig.show='hide', fig.height=7, fig.width=9}
+```{r sentiment, fig.show='hide', fig.height=7, fig.width=9}
 ## clean up the text a bit (rm mentions and links)
 rt$text2 <- gsub(
-  "^RT:?\\s{0,}|#|@\\S+|https?[[:graph:]]", "", rt$text)
+  "^RT:?\\s{0,}|#|@\\S+|https?[[:graph:]]+", "", rt$text)
 ## convert to lower case
 rt$text2 <- tolower(rt$text2)
 ## trim extra white space
@@ -213,8 +213,7 @@ rt %>%
     caption = "\nSource: Data gathered using rtweet. Sentiment analysis done using syuzhet")
 ```
 
-<p align="center">
-<img width="100%" height="auto" src="README_files/figure-markdown_github/unnamed-chunk-7-1.png" /></p>
+<p align="center"><img width="100%" height="auto" src="README_files/figure-markdown_github/sentiment-1.png" /></p>
 
 &nbsp;
 
@@ -222,7 +221,7 @@ rt %>%
 
 The code below provides a quick and dirty visualization of the semantic network (connections via retweet, quote, mention, or reply) found in the data.
 
-```{r fig.show='hide', fig.height=36, fig.width=36}
+```{r network, fig.show='hide', fig.height=36, fig.width=36}
 ## unlist observations into long-form data frame
 unlist_df <- function(...) {
   dots <- lapply(list(...), unlist)
@@ -245,20 +244,24 @@ rdf <- tidyr::gather(rdf, interaction_type, to_screen_name, -from_screen_name)
 mat <- as.matrix(rdf[, -2])
 mat <- mat[apply(mat, 1, function(i) !any(is.na(i))), ]
 
-## filter out users who don't appear in both sides at least once
-apps1 <- table(mat[, 1])
-apps2 <- table(mat[, 2])
-apps <- names(apps1)[names(apps1) %in% names(apps2)]
+## get rid of self references
+mat <- mat[mat[, 1] != mat[, 2], ]
 
-## filter and convert to matrix
-mat <- mat[mat[, 1] %in% apps & mat[, 1] != mat[, 2], ]
+## filter out users who don't appear in RHS at least 3 times
+apps1 <- table(mat[, 1])
+apps1 <- apps1[apps1 > 1L]
+apps2 <- table(mat[, 2])
+apps2 <- apps2[apps2 > 1L]
+apps <- names(apps1)[names(apps1) %in% names(apps2)]
+mat <- mat[mat[, 1] %in% apps & mat[, 2] %in% apps, ]
 
 ## create graph object
 g <- igraph::graph_from_edgelist(mat)
 
 ## calculate size attribute (and transform to fit)
-size <- table(c(mat[, 1], mat[, 2]))
-size <- sqrt(size) * 1.25
+matcols <- factor(c(mat[, 1], mat[, 2]), levels = names(igraph::V(g)))
+size <- table(screen_name = matcols)
+size <- (log(size) + sqrt(size)) / 3
 
 ## reorder freq table
 size <- size[match(names(size), names(igraph::V(g)))]
@@ -287,28 +290,35 @@ mtext("Source: Data gathered using rtweet. Network analysis done using igraph",
   side = 1, line = 0, adj = 1.0, cex = 3.8,
   family = "Roboto Condensed", col = "#222222")
 mtext("User connections by mentions, replies, retweets, and quotes",
-  side = 3, line = -5, adj = 0,
+  side = 3, line = -4.25, adj = 0,
   family = "Roboto Condensed", cex = 4.9)
 ```
 
 
-<p align="center">
-<img width="100%" height="auto" src="README_files/figure-markdown_github/unnamed-chunk-8-1.png" /></p>
+<p align="center"><img width="100%" height="auto" src="README_files/figure-markdown_github/network-1.png" /></p>
 
 &nbsp;
+
+Ideally, the network visualization would be an interactive, searchable graphic. Since it's not, I've printed out the node size values below.
+
+```{r}
+print(as_tibble(sort(size, decreasing = TRUE)), n = length(size))
+```
+
+
 
 ### Tidyverse vs. Shiny
 
 This code identifies tweets by topic, detecting mentions of the tidyverse [packages] and shiny. It then plots the frequency of those tweets over time.
 
-```{r fig.show='hide', fig.height=7, fig.width=9}
+```{r topics, fig.show='hide', fig.height=7, fig.width=9}
 rt %>%
   filter(created_at > "2018-02-01") %>%
   mutate(
     text = tolower(text),
     tidyverse = str_detect(
       text, "dplyr|tidyeval|tidyverse|rlang|map|purrr|readr|tibble"),
-    shiny = str_detect(text, "shiny")
+    shiny = str_detect(text, "shiny|dashboard|interactiv")
   ) %>%
   select(created_at, tidyverse:shiny) %>%
   gather(pkg, mention, -created_at) %>%
@@ -332,9 +342,54 @@ rt %>%
     title = "Frequency of tweets about Tidyverse and Shiny during rstudio::conf",
     subtitle = "Tweet counts aggregated for each topic in two-hour intervals",
     caption = "\nSource: Data gathered using rtweet. Made pretty by ggplot2.")
-
 ```
 
-<p align="center">
-<img width="100%" height="auto" src="README_files/figure-markdown_github/unnamed-chunk-9-1.png" />
-</p>
+
+<p align="center"><img width="100%" height="auto" src="README_files/figure-markdown_github/topics-1.png" /></p>
+
+&nbsp;
+
+### Word clouds
+
+I didn't want to add a bunch more code, so here I'm sourcing the prep work/code I used to get word lists.
+
+```{r}
+source(file.path("R", "words.R"))
+```
+
+
+#### Shiny word cloud
+
+This first word cloud depicts the most popular non-stopwords used in tweets about Shiny.
+
+```{r shiny, fig.show='hide', fig.height=5, fig.width=7}
+par(mar = c(2, 2, 2, 2))
+wordcloud::wordcloud(
+  shiny$var, shiny$n, min.freq = 3,
+  random.order = FALSE,
+  random.color = FALSE,
+  colors = gg_cols(5)
+)
+```
+
+
+<p align="center"><img width="100%" height="auto" src="README_files/figure-markdown_github/shiny-1.png" /></p>
+
+&nbsp;
+
+#### Tidyverse word cloud
+
+The second word cloud depicts the most popular non-stopwords used in tweets about the tidyverse.
+
+```{r tidyverse, fig.show='hide', fig.height=5, fig.width=7}
+par(mar = c(2, 2, 2, 2))
+wordcloud::wordcloud(
+  tidyverse$var, tidyverse$n, min.freq = 4,
+  random.order = FALSE,
+  random.color = FALSE,
+  colors = gg_cols(5)
+)
+```
+
+
+<p align="center"><img width="100%" height="auto" src="README_files/figure-markdown_github/tidyverse-1.png" /></p>
