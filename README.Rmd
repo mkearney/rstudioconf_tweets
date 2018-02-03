@@ -1,27 +1,14 @@
 ---
-output: github_document
+title: "rstudio::conf tweets"
+author: "A repository for tracking [tweets](https://twitter.com/hashtag/rstudioconf?f=tweets&vertical=default&src=hash) about [rstudio::conf 2018](https://www.rstudio.com/conference/)."
+output: 
+  github_document:
+    toc: true
+    df_print: "kable"
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, collapse = TRUE)
-```
-
-# rstudio::conf tweets
-
-A repository for tracking [tweets](https://twitter.com/hashtag/rstudioconf?f=tweets&vertical=default&src=hash) about [rstudio::conf 2018](https://www.rstudio.com/conference/).
-
-## rtweet
-
-To make it easier to request data from Twitter's APIs, install [if it's not already] and load [rtweet](http://rtweet.info).
-
-```{r}
-## install rtweet if not already
-if (!requireNamespace("rtweet", quietly = TRUE)) {
-  install.packages("rtweet")
-}
-
-## load rtweet
-library(rtweet)
 ```
 
 ## Data
@@ -42,9 +29,27 @@ ids <- readRDS("rstudioconf_search-ids.rds")
 rt <- rtweet::lookup_tweets(ids$status_id)
 ```
 
-## Stream
+### rtweet
 
-There are two easy ways to get Twitter data filtered by one or more keywords. The first way is to stream the data (using Twitter's stream API). For example, in the code below, a stream is setup to run continuously from the moment its executed until the Saturday at midnight (to roughly coincide with the end of the conference).
+Whether you lookup the status IDs or search/stream new tweets, make sure you've installed the [rtweet](http://rtweet.info) package. The code below will install [if it's not already] and load rtweet.
+
+```{r}
+## install rtweet if not already
+if (!requireNamespace("rtweet", quietly = TRUE)) {
+  install.packages("rtweet")
+}
+
+## load rtweet
+library(rtweet)
+```
+
+## Twitter APIs
+
+There are two easy [and free] ways to get lots of Twitter data, filtering by one or more keywords. Each method is described and demonstrated below.
+
+### Stream
+
+The first way is to stream the data (using Twitter's stream API). For example, in the code below, a stream is setup to run continuously from the moment its executed until the Saturday at midnight (to roughly coincide with the end of the conference).
 
 ```{r, eval=FALSE}
 ## set stream time
@@ -75,7 +80,7 @@ stream_tweets(
 rt <- parse_stream(json_file)
 ```
 
-## Search
+### Search
 
 The second easy way to gather Twitter data using one or more keywords is to search for the data (using Twitter's REST API). Unlike streaming, searching makes it possible to go back in time. Unfortunately, Twitter sets a rather restrictive cap–roughly nine days–on how far back you can go. Regardless, searching for tweets is often the preferred method. For example, the code below is setup in such a way that it can be executed once [or even several times] a day throughout the conference.
 
@@ -303,7 +308,12 @@ mtext("User connections by mentions, replies, retweets, and quotes",
 Ideally, the network visualization would be an interactive, searchable graphic. Since it's not, I've printed out the node size values below.
 
 ```{r}
-print(as_tibble(sort(size, decreasing = TRUE)), n = length(size))
+nodes <- as_tibble(sort(size, decreasing = TRUE))
+nodes$rank <- seq_len(nrow(nodes))
+nodes$screen_name <- paste0(
+  '<a href="https://twitter.com/', nodes$screen_name, 
+  '">@', nodes$screen_name, '</a>')
+dplyr::select(nodes, rank, screen_name, log_n = n)
 ```
 
 

@@ -1,23 +1,18 @@
-
 rstudio::conf tweets
-====================
-
+================
 A repository for tracking [tweets](https://twitter.com/hashtag/rstudioconf?f=tweets&vertical=default&src=hash) about [rstudio::conf 2018](https://www.rstudio.com/conference/).
 
-rtweet
-------
-
-To make it easier to request data from Twitter's APIs, install \[if it's not already\] and load [rtweet](http://rtweet.info).
-
-``` r
-## install rtweet if not already
-if (!requireNamespace("rtweet", quietly = TRUE)) {
-  install.packages("rtweet")
-}
-
-## load rtweet
-library(rtweet)
-```
+-   [Data](#data)
+    -   [rtweet](#rtweet)
+-   [Twitter APIs](#twitter-apis)
+    -   [Stream](#stream)
+    -   [Search](#search)
+-   [Explore](#explore)
+    -   [Tweet frequency over time](#tweet-frequency-over-time)
+    -   [Positive/negative sentiment](#positivenegative-sentiment)
+    -   [Semantic networks](#semantic-networks)
+    -   [Tidyverse vs. Shiny](#tidyverse-vs.-shiny)
+    -   [Word clouds](#word-clouds)
 
 Data
 ----
@@ -38,10 +33,28 @@ ids <- readRDS("rstudioconf_search-ids.rds")
 rt <- rtweet::lookup_tweets(ids$status_id)
 ```
 
-Stream
-------
+### rtweet
 
-There are two easy ways to get Twitter data filtered by one or more keywords. The first way is to stream the data (using Twitter's stream API). For example, in the code below, a stream is setup to run continuously from the moment its executed until the Saturday at midnight (to roughly coincide with the end of the conference).
+Whether you lookup the status IDs or search/stream new tweets, make sure you've installed the [rtweet](http://rtweet.info) package. The code below will install \[if it's not already\] and load rtweet.
+
+``` r
+## install rtweet if not already
+if (!requireNamespace("rtweet", quietly = TRUE)) {
+  install.packages("rtweet")
+}
+
+## load rtweet
+library(rtweet)
+```
+
+Twitter APIs
+------------
+
+There are two easy \[and free\] ways to get lots of Twitter data, filtering by one or more keywords. Each method is described and demonstrated below.
+
+### Stream
+
+The first way is to stream the data (using Twitter's stream API). For example, in the code below, a stream is setup to run continuously from the moment its executed until the Saturday at midnight (to roughly coincide with the end of the conference).
 
 ``` r
 ## set stream time
@@ -72,8 +85,7 @@ stream_tweets(
 rt <- parse_stream(json_file)
 ```
 
-Search
-------
+### Search
 
 The second easy way to gather Twitter data using one or more keywords is to search for the data (using Twitter's REST API). Unlike streaming, searching makes it possible to go back in time. Unfortunately, Twitter sets a rather restrictive cap–roughly nine days–on how far back you can go. Regardless, searching for tweets is often the preferred method. For example, the code below is setup in such a way that it can be executed once \[or even several times\] a day throughout the conference.
 
@@ -303,196 +315,208 @@ mtext("User connections by mentions, replies, retweets, and quotes",
 Ideally, the network visualization would be an interactive, searchable graphic. Since it's not, I've printed out the node size values below.
 
 ``` r
-print(as_tibble(sort(size, decreasing = TRUE)), n = length(size))
-## # A tibble: 185 x 2
-##     screen_name         n
-##     <chr>           <dbl>
-##   1 hadleywickham   8.99 
-##   2 robinson_es     7.77 
-##   3 rstudio         7.58 
-##   4 drob            6.72 
-##   5 RLadiesGlobal   6.47 
-##   6 juliasilge      6.34 
-##   7 LucyStats       6.23 
-##   8 AmeliaMN        5.75 
-##   9 JennyBryan      5.30 
-##  10 stephhazlitt    5.28 
-##  11 d4tagirl        5.28 
-##  12 dataandme       5.08 
-##  13 visnut          5.01 
-##  14 EmilyRiederer   4.99 
-##  15 romain_francois 4.91 
-##  16 thmscwlls       4.89 
-##  17 Voovarb         4.89 
-##  18 CivicAngela     4.73 
-##  19 sharon000       4.62 
-##  20 kearneymw       4.55 
-##  21 njogukennly     4.53 
-##  22 datapointier    4.51 
-##  23 SK_convergence  4.25 
-##  24 minebocek       4.21 
-##  25 sharlagelfand   4.18 
-##  26 CorradoLanera   4.10 
-##  27 elhazen         4.08 
-##  28 tanyacash21     4.05 
-##  29 malco_bearhat   4.05 
-##  30 eamcvey         4.00 
-##  31 kara_woo        3.95 
-##  32 CMastication    3.95 
-##  33 old_man_chester 3.89 
-##  34 juliesquid      3.89 
-##  35 edzerpebesma    3.78 
-##  36 thomasp85       3.78 
-##  37 astroeringrand  3.72 
-##  38 kierisi         3.54 
-##  39 gdequeiroz      3.44 
-##  40 RLadiesBA       3.44 
-##  41 theRcast        3.41 
-##  42 _RCharlie       3.37 
-##  43 nic_crane       3.27 
-##  44 cpsievert       3.23 
-##  45 cantoflor_87    3.23 
-##  46 dvaughan32      3.19 
-##  47 nj_tierney      3.19 
-##  48 yutannihilation 3.19 
-##  49 ajmcoqui        3.16 
-##  50 MangoTheCat     3.12 
-##  51 taraskaduk      3.12 
-##  52 grrrck          3.12 
-##  53 RLadiesMVD      3.04 
-##  54 jessenleon      3.00 
-##  55 jasongrahn      3.00 
-##  56 kevin_ushey     2.96 
-##  57 shermstats      2.96 
-##  58 Bluelion0305    2.92 
-##  59 alice_data      2.92 
-##  60 ellisvalentiner 2.92 
-##  61 jafflerbach     2.87 
-##  62 Denironyx       2.87 
-##  63 ntweetor        2.87 
-##  64 Dorris_Scott    2.83 
-##  65 therriaultphd   2.83 
-##  66 bhive01         2.83 
-##  67 aindap          2.79 
-##  68 sellorm         2.69 
-##  69 bizScienc       2.69 
-##  70 tnederlof       2.69 
-##  71 duto_guerra     2.64 
-##  72 daattali        2.64 
-##  73 patsellers      2.64 
-##  74 BaumerBen       2.64 
-##  75 conjja          2.64 
-##  76 Blair09M        2.59 
-##  77 mfairbrocanada  2.59 
-##  78 krlmlr          2.59 
-##  79 JonathanZadra   2.54 
-##  80 alandipert      2.54 
-##  81 plzbeemyfriend  2.54 
-##  82 NovasTaylor     2.54 
-##  83 sgrifter        2.49 
-##  84 jamie_jezebel   2.43 
-##  85 RLadiesOrlando  2.43 
-##  86 ijlyttle        2.43 
-##  87 jarvmiller      2.43 
-##  88 sheilasaia      2.43 
-##  89 SDanielZafar1   2.38 
-##  90 ma_salmon       2.38 
-##  91 deekareithi     2.38 
-##  92 drvnanduri      2.32 
-##  93 danielphadley   2.32 
-##  94 millerdl        2.32 
-##  95 zevross         2.32 
-##  96 just_add_data   2.26 
-##  97 chrisderv       2.26 
-##  98 hugobowne       2.26 
-##  99 ibddoctor       2.19 
-## 100 MineDogucu      2.19 
-## 101 markroepke      2.19 
-## 102 pacocuak        2.19 
-## 103 hrbrmstr        2.13 
-## 104 seankross       2.13 
-## 105 jimhester_      2.06 
-## 106 dnlmc           2.06 
-## 107 jent103         2.06 
-## 108 darokun         2.06 
-## 109 OHIscience      2.06 
-## 110 hspter          1.98 
-## 111 DoITBoston      1.98 
-## 112 paylakatel      1.98 
-## 113 kyrietree       1.98 
-## 114 math_dominick   1.90 
-## 115 kpivert         1.90 
-## 116 wmlandau        1.90 
-## 117 tcbanalytics    1.90 
-## 118 RhoBott         1.82 
-## 119 simecek         1.82 
-## 120 jakethomp       1.82 
-## 121 egolinko        1.82 
-## 122 revodavid       1.82 
-## 123 DJShearwater    1.73 
-## 124 mmmpork         1.73 
-## 125 LuisDVerde      1.73 
-## 126 chrisalbon      1.73 
-## 127 n_ashutosh      1.73 
-## 128 JonTheGeek      1.64 
-## 129 nicoleradziwill 1.64 
-## 130 OmniaRaouf      1.64 
-## 131 R_by_Ryo        1.64 
-## 132 JeanetheFalvey  1.64 
-## 133 harry_seunghoon 1.64 
-## 134 alichiang13     1.64 
-## 135 ParmutiaMakui   1.64 
-## 136 RLadiesNYC      1.53 
-## 137 _NickGolding_   1.53 
-## 138 aaronchall      1.53 
-## 139 AllenDowney     1.53 
-## 140 lariebyrd       1.53 
-## 141 jdblischak      1.53 
-## 142 maryclaryf      1.53 
-## 143 uncmbbtrivia    1.53 
-## 144 msciain         1.41 
-## 145 samhinshaw      1.41 
-## 146 abresler        1.41 
-## 147 zymla           1.41 
-## 148 TrestleJeff     1.41 
-## 149 Nujcharee       1.41 
-## 150 jebyrnes        1.28 
-## 151 butterflyology  1.28 
-## 152 RobynLBall      1.28 
-## 153 runnersbyte     1.28 
-## 154 tonyfujs        1.28 
-## 155 ledell          1.28 
-## 156 kwbroman        1.28 
-## 157 VParrillaAixela 1.28 
-## 158 rweekly_org     1.28 
-## 159 ROfficeHours    1.13 
-## 160 sgpln           1.13 
-## 161 olgavitek       1.13 
-## 162 eirenkate       1.13 
-## 163 KurggMantra     1.13 
-## 164 RLadiesColumbus 1.13 
-## 165 claytonyochum   1.13 
-## 166 CaltechChemLib  1.13 
-## 167 AriLamstein     1.13 
-## 168 canoodleson     1.13 
-## 169 dobbleobble     1.13 
-## 170 bogdanrau       1.13 
-## 171 jhollist        1.13 
-## 172 RLadiesTC       1.13 
-## 173 ucdlevy         0.944
-## 174 ukacz           0.944
-## 175 jomilo75        0.944
-## 176 EricLeeKrantz   0.702
-## 177 benjamingreve   0.702
-## 178 harrismcgehee   0.702
-## 179 javierluraschi  0.702
-## 180 volha_tryputsen 0.702
-## 181 bj_bloom        0.702
-## 182 jaredlander     0.702
-## 183 awunderground   0.702
-## 184 Md_Harris       0.333
-## 185 s_pearce        0.333
+nodes <- as_tibble(sort(size, decreasing = TRUE))
+nodes$rank <- seq_len(nrow(nodes))
+nodes$screen_name <- paste0(
+  '<a href="https://twitter.com/', nodes$screen_name, 
+  '">@', nodes$screen_name, '</a>')
+dplyr::select(nodes, rank, screen_name, log_n = n)
 ```
+
+|  rank| screen\_name                                                         |     log\_n|
+|-----:|:---------------------------------------------------------------------|----------:|
+|     1| <a href="https://twitter.com/hadleywickham">@hadleywickham</a>       |  9.7491156|
+|     2| <a href="https://twitter.com/robinson_es">@robinson\_es</a>          |  8.3253126|
+|     3| <a href="https://twitter.com/drob">@drob</a>                         |  7.8856216|
+|     4| <a href="https://twitter.com/rstudio">@rstudio</a>                   |  7.6640200|
+|     5| <a href="https://twitter.com/LucyStats">@LucyStats</a>               |  6.9420411|
+|     6| <a href="https://twitter.com/juliasilge">@juliasilge</a>             |  6.9420411|
+|     7| <a href="https://twitter.com/RLadiesGlobal">@RLadiesGlobal</a>       |  6.5336590|
+|     8| <a href="https://twitter.com/AmeliaMN">@AmeliaMN</a>                 |  5.8774667|
+|     9| <a href="https://twitter.com/dataandme">@dataandme</a>               |  5.7999183|
+|    10| <a href="https://twitter.com/JennyBryan">@JennyBryan</a>             |  5.7368340|
+|    11| <a href="https://twitter.com/d4tagirl">@d4tagirl</a>                 |  5.4912256|
+|    12| <a href="https://twitter.com/stephhazlitt">@stephhazlitt</a>         |  5.4402402|
+|    13| <a href="https://twitter.com/romain_francois">@romain\_francois</a>  |  5.4058764|
+|    14| <a href="https://twitter.com/EmilyRiederer">@EmilyRiederer</a>       |  5.2292785|
+|    15| <a href="https://twitter.com/Voovarb">@Voovarb</a>                   |  5.2292785|
+|    16| <a href="https://twitter.com/visnut">@visnut</a>                     |  5.0817280|
+|    17| <a href="https://twitter.com/sharlagelfand">@sharlagelfand</a>       |  5.0628563|
+|    18| <a href="https://twitter.com/sharon000">@sharon000</a>               |  4.9863564|
+|    19| <a href="https://twitter.com/thmscwlls">@thmscwlls</a>               |  4.9669704|
+|    20| <a href="https://twitter.com/CivicAngela">@CivicAngela</a>           |  4.9278735|
+|    21| <a href="https://twitter.com/astroeringrand">@astroeringrand</a>     |  4.8683901|
+|    22| <a href="https://twitter.com/SK_convergence">@SK\_convergence</a>    |  4.7044839|
+|    23| <a href="https://twitter.com/kara_woo">@kara\_woo</a>                |  4.6834172|
+|    24| <a href="https://twitter.com/kearneymw">@kearneymw</a>               |  4.6622142|
+|    25| <a href="https://twitter.com/njogukennly">@njogukennly</a>           |  4.5540652|
+|    26| <a href="https://twitter.com/datapointier">@datapointier</a>         |  4.5097581|
+|    27| <a href="https://twitter.com/eamcvey">@eamcvey</a>                   |  4.4873681|
+|    28| <a href="https://twitter.com/CMastication">@CMastication</a>         |  4.4420995|
+|    29| <a href="https://twitter.com/elhazen">@elhazen</a>                   |  4.2781544|
+|    30| <a href="https://twitter.com/tanyacash21">@tanyacash21</a>           |  4.2296099|
+|    31| <a href="https://twitter.com/minebocek">@minebocek</a>               |  4.2050318|
+|    32| <a href="https://twitter.com/CorradoLanera">@CorradoLanera</a>       |  4.1300151|
+|    33| <a href="https://twitter.com/malco_bearhat">@malco\_bearhat</a>      |  4.1045644|
+|    34| <a href="https://twitter.com/juliesquid">@juliesquid</a>             |  3.9467704|
+|    35| <a href="https://twitter.com/jimhester_">@jimhester\_</a>            |  3.8920720|
+|    36| <a href="https://twitter.com/edzerpebesma">@edzerpebesma</a>         |  3.8920720|
+|    37| <a href="https://twitter.com/old_man_chester">@old\_man\_chester</a> |  3.8920720|
+|    38| <a href="https://twitter.com/thomasp85">@thomasp85</a>               |  3.8362222|
+|    39| <a href="https://twitter.com/ijlyttle">@ijlyttle</a>                 |  3.6306068|
+|    40| <a href="https://twitter.com/kierisi">@kierisi</a>                   |  3.5369905|
+|    41| <a href="https://twitter.com/_RCharlie">@\_RCharlie</a>              |  3.5049555|
+|    42| <a href="https://twitter.com/nic_crane">@nic\_crane</a>              |  3.4724797|
+|    43| <a href="https://twitter.com/gdequeiroz">@gdequeiroz</a>             |  3.4395462|
+|    44| <a href="https://twitter.com/RLadiesBA">@RLadiesBA</a>               |  3.4395462|
+|    45| <a href="https://twitter.com/ajmcoqui">@ajmcoqui</a>                 |  3.4061368|
+|    46| <a href="https://twitter.com/theRcast">@theRcast</a>                 |  3.4061368|
+|    47| <a href="https://twitter.com/dvaughan32">@dvaughan32</a>             |  3.3378116|
+|    48| <a href="https://twitter.com/Dorris_Scott">@Dorris\_Scott</a>        |  3.3378116|
+|    49| <a href="https://twitter.com/grrrck">@grrrck</a>                     |  3.2673334|
+|    50| <a href="https://twitter.com/cpsievert">@cpsievert</a>               |  3.2312268|
+|    51| <a href="https://twitter.com/MangoTheCat">@MangoTheCat</a>           |  3.2312268|
+|    52| <a href="https://twitter.com/shermstats">@shermstats</a>             |  3.2312268|
+|    53| <a href="https://twitter.com/cantoflor_87">@cantoflor\_87</a>        |  3.2312268|
+|    54| <a href="https://twitter.com/jcheng">@jcheng</a>                     |  3.1945063|
+|    55| <a href="https://twitter.com/nj_tierney">@nj\_tierney</a>            |  3.1945063|
+|    56| <a href="https://twitter.com/kevin_ushey">@kevin\_ushey</a>          |  3.1945063|
+|    57| <a href="https://twitter.com/yutannihilation">@yutannihilation</a>   |  3.1945063|
+|    58| <a href="https://twitter.com/jasongrahn">@jasongrahn</a>             |  3.1571426|
+|    59| <a href="https://twitter.com/jessenleon">@jessenleon</a>             |  3.1571426|
+|    60| <a href="https://twitter.com/taraskaduk">@taraskaduk</a>             |  3.1571426|
+|    61| <a href="https://twitter.com/sellorm">@sellorm</a>                   |  3.0803567|
+|    62| <a href="https://twitter.com/Bluelion0305">@Bluelion0305</a>         |  3.0408634|
+|    63| <a href="https://twitter.com/ellisvalentiner">@ellisvalentiner</a>   |  3.0408634|
+|    64| <a href="https://twitter.com/seankross">@seankross</a>               |  3.0408634|
+|    65| <a href="https://twitter.com/RLadiesMVD">@RLadiesMVD</a>             |  3.0408634|
+|    66| <a href="https://twitter.com/jent103">@jent103</a>                   |  3.0005839|
+|    67| <a href="https://twitter.com/bhive01">@bhive01</a>                   |  2.9594743|
+|    68| <a href="https://twitter.com/alice_data">@alice\_data</a>            |  2.9174869|
+|    69| <a href="https://twitter.com/jafflerbach">@jafflerbach</a>           |  2.8745690|
+|    70| <a href="https://twitter.com/Denironyx">@Denironyx</a>               |  2.8745690|
+|    71| <a href="https://twitter.com/ntweetor">@ntweetor</a>                 |  2.8745690|
+|    72| <a href="https://twitter.com/patsellers">@patsellers</a>             |  2.8306631|
+|    73| <a href="https://twitter.com/therriaultphd">@therriaultphd</a>       |  2.8306631|
+|    74| <a href="https://twitter.com/aindap">@aindap</a>                     |  2.7857054|
+|    75| <a href="https://twitter.com/sgrifter">@sgrifter</a>                 |  2.7396253|
+|    76| <a href="https://twitter.com/daattali">@daattali</a>                 |  2.6923444|
+|    77| <a href="https://twitter.com/bizScienc">@bizScienc</a>               |  2.6923444|
+|    78| <a href="https://twitter.com/tnederlof">@tnederlof</a>               |  2.6923444|
+|    79| <a href="https://twitter.com/Blair09M">@Blair09M</a>                 |  2.6437752|
+|    80| <a href="https://twitter.com/duto_guerra">@duto\_guerra</a>          |  2.6437752|
+|    81| <a href="https://twitter.com/krlmlr">@krlmlr</a>                     |  2.6437752|
+|    82| <a href="https://twitter.com/claytonyochum">@claytonyochum</a>       |  2.6437752|
+|    83| <a href="https://twitter.com/BaumerBen">@BaumerBen</a>               |  2.6437752|
+|    84| <a href="https://twitter.com/conjja">@conjja</a>                     |  2.6437752|
+|    85| <a href="https://twitter.com/mfairbrocanada">@mfairbrocanada</a>     |  2.5938194|
+|    86| <a href="https://twitter.com/JonathanZadra">@JonathanZadra</a>       |  2.5423660|
+|    87| <a href="https://twitter.com/alandipert">@alandipert</a>             |  2.5423660|
+|    88| <a href="https://twitter.com/plzbeemyfriend">@plzbeemyfriend</a>     |  2.5423660|
+|    89| <a href="https://twitter.com/NovasTaylor">@NovasTaylor</a>           |  2.5423660|
+|    90| <a href="https://twitter.com/millerdl">@millerdl</a>                 |  2.5423660|
+|    91| <a href="https://twitter.com/chrisderv">@chrisderv</a>               |  2.4892894|
+|    92| <a href="https://twitter.com/jamie_jezebel">@jamie\_jezebel</a>      |  2.4344460|
+|    93| <a href="https://twitter.com/RLadiesOrlando">@RLadiesOrlando</a>     |  2.4344460|
+|    94| <a href="https://twitter.com/jarvmiller">@jarvmiller</a>             |  2.4344460|
+|    95| <a href="https://twitter.com/sheilasaia">@sheilasaia</a>             |  2.4344460|
+|    96| <a href="https://twitter.com/danielphadley">@danielphadley</a>       |  2.3776708|
+|    97| <a href="https://twitter.com/SDanielZafar1">@SDanielZafar1</a>       |  2.3776708|
+|    98| <a href="https://twitter.com/nicoleradziwill">@nicoleradziwill</a>   |  2.3776708|
+|    99| <a href="https://twitter.com/lariebyrd">@lariebyrd</a>               |  2.3776708|
+|   100| <a href="https://twitter.com/zevross">@zevross</a>                   |  2.3776708|
+|   101| <a href="https://twitter.com/ma_salmon">@ma\_salmon</a>              |  2.3776708|
+|   102| <a href="https://twitter.com/deekareithi">@deekareithi</a>           |  2.3776708|
+|   103| <a href="https://twitter.com/drvnanduri">@drvnanduri</a>             |  2.3187730|
+|   104| <a href="https://twitter.com/simecek">@simecek</a>                   |  2.3187730|
+|   105| <a href="https://twitter.com/mmmpork">@mmmpork</a>                   |  2.2575296|
+|   106| <a href="https://twitter.com/just_add_data">@just\_add\_data</a>     |  2.2575296|
+|   107| <a href="https://twitter.com/hugobowne">@hugobowne</a>               |  2.2575296|
+|   108| <a href="https://twitter.com/ibddoctor">@ibddoctor</a>               |  2.1936778|
+|   109| <a href="https://twitter.com/MineDogucu">@MineDogucu</a>             |  2.1936778|
+|   110| <a href="https://twitter.com/markroepke">@markroepke</a>             |  2.1936778|
+|   111| <a href="https://twitter.com/pacocuak">@pacocuak</a>                 |  2.1936778|
+|   112| <a href="https://twitter.com/hrbrmstr">@hrbrmstr</a>                 |  2.1269049|
+|   113| <a href="https://twitter.com/hspter">@hspter</a>                     |  2.1269049|
+|   114| <a href="https://twitter.com/RLadiesNash">@RLadiesNash</a>           |  2.1269049|
+|   115| <a href="https://twitter.com/butterflyology">@butterflyology</a>     |  2.0568335|
+|   116| <a href="https://twitter.com/dnlmc">@dnlmc</a>                       |  2.0568335|
+|   117| <a href="https://twitter.com/darokun">@darokun</a>                   |  2.0568335|
+|   118| <a href="https://twitter.com/OHIscience">@OHIscience</a>             |  2.0568335|
+|   119| <a href="https://twitter.com/RhoBott">@RhoBott</a>                   |  1.9830028|
+|   120| <a href="https://twitter.com/jakethomp">@jakethomp</a>               |  1.9830028|
+|   121| <a href="https://twitter.com/egolinko">@egolinko</a>                 |  1.9830028|
+|   122| <a href="https://twitter.com/DoITBoston">@DoITBoston</a>             |  1.9830028|
+|   123| <a href="https://twitter.com/paylakatel">@paylakatel</a>             |  1.9830028|
+|   124| <a href="https://twitter.com/kyrietree">@kyrietree</a>               |  1.9830028|
+|   125| <a href="https://twitter.com/math_dominick">@math\_dominick</a>      |  1.9048400|
+|   126| <a href="https://twitter.com/kpivert">@kpivert</a>                   |  1.9048400|
+|   127| <a href="https://twitter.com/javierluraschi">@javierluraschi</a>     |  1.9048400|
+|   128| <a href="https://twitter.com/wmlandau">@wmlandau</a>                 |  1.9048400|
+|   129| <a href="https://twitter.com/tcbanalytics">@tcbanalytics</a>         |  1.9048400|
+|   130| <a href="https://twitter.com/ParmutiaMakui">@ParmutiaMakui</a>       |  1.8216209|
+|   131| <a href="https://twitter.com/revodavid">@revodavid</a>               |  1.8216209|
+|   132| <a href="https://twitter.com/DJShearwater">@DJShearwater</a>         |  1.7324082|
+|   133| <a href="https://twitter.com/LuisDVerde">@LuisDVerde</a>             |  1.7324082|
+|   134| <a href="https://twitter.com/chrisalbon">@chrisalbon</a>             |  1.7324082|
+|   135| <a href="https://twitter.com/n_ashutosh">@n\_ashutosh</a>            |  1.7324082|
+|   136| <a href="https://twitter.com/Nujcharee">@Nujcharee</a>               |  1.6359562|
+|   137| <a href="https://twitter.com/JonTheGeek">@JonTheGeek</a>             |  1.6359562|
+|   138| <a href="https://twitter.com/OmniaRaouf">@OmniaRaouf</a>             |  1.6359562|
+|   139| <a href="https://twitter.com/R_by_Ryo">@R\_by\_Ryo</a>               |  1.6359562|
+|   140| <a href="https://twitter.com/JeanetheFalvey">@JeanetheFalvey</a>     |  1.6359562|
+|   141| <a href="https://twitter.com/harry_seunghoon">@harry\_seunghoon</a>  |  1.6359562|
+|   142| <a href="https://twitter.com/alichiang13">@alichiang13</a>           |  1.6359562|
+|   143| <a href="https://twitter.com/RLadiesNYC">@RLadiesNYC</a>             |  1.5305538|
+|   144| <a href="https://twitter.com/_NickGolding_">@\_NickGolding\_</a>     |  1.5305538|
+|   145| <a href="https://twitter.com/samhinshaw">@samhinshaw</a>             |  1.5305538|
+|   146| <a href="https://twitter.com/RobynLBall">@RobynLBall</a>             |  1.5305538|
+|   147| <a href="https://twitter.com/aaronchall">@aaronchall</a>             |  1.5305538|
+|   148| <a href="https://twitter.com/AllenDowney">@AllenDowney</a>           |  1.5305538|
+|   149| <a href="https://twitter.com/RiinuOts">@RiinuOts</a>                 |  1.5305538|
+|   150| <a href="https://twitter.com/tonyfujs">@tonyfujs</a>                 |  1.5305538|
+|   151| <a href="https://twitter.com/b23kelly">@b23kelly</a>                 |  1.5305538|
+|   152| <a href="https://twitter.com/jdblischak">@jdblischak</a>             |  1.5305538|
+|   153| <a href="https://twitter.com/maryclaryf">@maryclaryf</a>             |  1.5305538|
+|   154| <a href="https://twitter.com/uncmbbtrivia">@uncmbbtrivia</a>         |  1.5305538|
+|   155| <a href="https://twitter.com/msciain">@msciain</a>                   |  1.4137497|
+|   156| <a href="https://twitter.com/abresler">@abresler</a>                 |  1.4137497|
+|   157| <a href="https://twitter.com/zymla">@zymla</a>                       |  1.4137497|
+|   158| <a href="https://twitter.com/TrestleJeff">@TrestleJeff</a>           |  1.4137497|
+|   159| <a href="https://twitter.com/jebyrnes">@jebyrnes</a>                 |  1.2818353|
+|   160| <a href="https://twitter.com/ROfficeHours">@ROfficeHours</a>         |  1.2818353|
+|   161| <a href="https://twitter.com/runnersbyte">@runnersbyte</a>           |  1.2818353|
+|   162| <a href="https://twitter.com/ledell">@ledell</a>                     |  1.2818353|
+|   163| <a href="https://twitter.com/kwbroman">@kwbroman</a>                 |  1.2818353|
+|   164| <a href="https://twitter.com/VParrillaAixela">@VParrillaAixela</a>   |  1.2818353|
+|   165| <a href="https://twitter.com/rweekly_org">@rweekly\_org</a>          |  1.2818353|
+|   166| <a href="https://twitter.com/sgpln">@sgpln</a>                       |  1.1287648|
+|   167| <a href="https://twitter.com/arjunsbaghela">@arjunsbaghela</a>       |  1.1287648|
+|   168| <a href="https://twitter.com/_lionelhenry">@\_lionelhenry</a>        |  1.1287648|
+|   169| <a href="https://twitter.com/olgavitek">@olgavitek</a>               |  1.1287648|
+|   170| <a href="https://twitter.com/eirenkate">@eirenkate</a>               |  1.1287648|
+|   171| <a href="https://twitter.com/KurggMantra">@KurggMantra</a>           |  1.1287648|
+|   172| <a href="https://twitter.com/RLadiesColumbus">@RLadiesColumbus</a>   |  1.1287648|
+|   173| <a href="https://twitter.com/CaltechChemLib">@CaltechChemLib</a>     |  1.1287648|
+|   174| <a href="https://twitter.com/AriLamstein">@AriLamstein</a>           |  1.1287648|
+|   175| <a href="https://twitter.com/canoodleson">@canoodleson</a>           |  1.1287648|
+|   176| <a href="https://twitter.com/dobbleobble">@dobbleobble</a>           |  1.1287648|
+|   177| <a href="https://twitter.com/bogdanrau">@bogdanrau</a>               |  1.1287648|
+|   178| <a href="https://twitter.com/jhollist">@jhollist</a>                 |  1.1287648|
+|   179| <a href="https://twitter.com/RLadiesTC">@RLadiesTC</a>               |  1.1287648|
+|   180| <a href="https://twitter.com/jherndon01">@jherndon01</a>             |  0.9435544|
+|   181| <a href="https://twitter.com/awunderground">@awunderground</a>       |  0.9435544|
+|   182| <a href="https://twitter.com/ucdlevy">@ucdlevy</a>                   |  0.9435544|
+|   183| <a href="https://twitter.com/ukacz">@ukacz</a>                       |  0.9435544|
+|   184| <a href="https://twitter.com/jomilo75">@jomilo75</a>                 |  0.9435544|
+|   185| <a href="https://twitter.com/EricLeeKrantz">@EricLeeKrantz</a>       |  0.7024536|
+|   186| <a href="https://twitter.com/benjamingreve">@benjamingreve</a>       |  0.7024536|
+|   187| <a href="https://twitter.com/harrismcgehee">@harrismcgehee</a>       |  0.7024536|
+|   188| <a href="https://twitter.com/s_pearce">@s\_pearce</a>                |  0.7024536|
+|   189| <a href="https://twitter.com/volha_tryputsen">@volha\_tryputsen</a>  |  0.7024536|
+|   190| <a href="https://twitter.com/bj_bloom">@bj\_bloom</a>                |  0.7024536|
+|   191| <a href="https://twitter.com/jaredlander">@jaredlander</a>           |  0.7024536|
+|   192| <a href="https://twitter.com/Md_Harris">@Md\_Harris</a>              |  0.3333333|
 
 ### Tidyverse vs. Shiny
 
