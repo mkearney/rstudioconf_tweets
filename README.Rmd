@@ -1,6 +1,6 @@
 ---
 title: "rstudio::conf tweets"
-author: "A repository for tracking [tweets](https://twitter.com/hashtag/rstudioconf?f=tweets&vertical=default&src=hash) about [rstudio::conf 2018](https://www.rstudio.com/conference/)."
+author: "A repository for tracking [tweets about rstudio::conf 2018](https://twitter.com/hashtag/rstudioconf?f=tweets&vertical=default&src=hash). Read more about the Rstudio conference at [rstudio.com/conference/](https://www.rstudio.com/conference/)."
 output: 
   github_document:
     toc: true
@@ -211,8 +211,10 @@ rt %>%
     plot.title = element_text(size = rel(1.7), face = "bold"),
     plot.subtitle = element_text(size = rel(1.3)),
     plot.caption = element_text(colour = "#444444")) +
-  scale_fill_manual(values = c(Positive = "#2244ee", Negative = "#dd2222")) +
-  scale_colour_manual(values = c(Positive = "#001155", Negative = "#550000")) +
+  scale_fill_manual(
+    values = c(Positive = "#2244ee", Negative = "#dd2222")) +
+  scale_colour_manual(
+    values = c(Positive = "#001155", Negative = "#550000")) +
   labs(x = NULL, y = NULL,
     title = "Sentiment (valence) of rstudio::conf tweets over time",
     subtitle = "Mean sentiment of tweets aggregated in one-hour intervals",
@@ -347,8 +349,10 @@ rt %>%
     plot.title = element_text(size = rel(1.7), face = "bold"),
     plot.subtitle = element_text(size = rel(1.3)),
     plot.caption = element_text(colour = "#444444")) +
-  scale_fill_manual(values = c(Tidyverse = "#2244ee", Shiny = "#dd2222")) +
-  scale_colour_manual(values = c(Tidyverse = "#001155", Shiny = "#550000")) +
+  scale_fill_manual(
+    values = c(Tidyverse = "#2244ee", Shiny = "#dd2222")) +
+  scale_colour_manual(
+    values = c(Tidyverse = "#001155", Shiny = "#550000")) +
   labs(x = NULL, y = NULL,
     title = "Frequency of tweets about Tidyverse and Shiny during rstudio::conf",
     subtitle = "Tweet counts aggregated for each topic in two-hour intervals",
