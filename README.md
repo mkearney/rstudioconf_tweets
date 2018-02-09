@@ -156,7 +156,7 @@ In the code below, the data is summarized into a time series-like data frame and
 
 ``` r
 rt %>%
-  filter(created_at > "2018-01-29" & created_at > "2018-02-05") %>%
+  filter(created_at > "2018-01-29") %>%
   ts_plot("2 hours", color = "transparent") +
   geom_smooth(method = "loess", se = FALSE, span = .1,
   size = 2, colour = "#0066aa") +
@@ -202,6 +202,7 @@ round_time <- function(x, sec) {
 
 ## plot by specified time interval (1-hours)
 rt %>%
+  filter(created_at < "2018-02-05") %>%
   mutate(time = round_time(created_at, 60 * 60)) %>%
   group_by(time) %>%
   summarise(sentiment = mean(sentiment, na.rm = TRUE)) %>%
