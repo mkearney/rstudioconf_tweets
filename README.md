@@ -202,7 +202,6 @@ round_time <- function(x, sec) {
 
 ## plot by specified time interval (1-hours)
 rt %>%
-  filter(created_at < "2018-02-05") %>%
   mutate(time = round_time(created_at, 60 * 60)) %>%
   group_by(time) %>%
   summarise(sentiment = mean(sentiment, na.rm = TRUE)) %>%
@@ -591,7 +590,7 @@ This code identifies tweets by topic, detecting mentions of the tidyverse \[pack
 
 ``` r
 rt %>%
-  filter(created_at > "2018-02-01") %>%
+  filter(created_at > "2018-02-01" & created_at < "2018-02-05") %>%
   mutate(
     text = tolower(text),
     tidyverse = str_detect(
